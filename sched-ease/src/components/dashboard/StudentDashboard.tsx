@@ -26,14 +26,14 @@ export default function StudentDashboard() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <DashboardCard
-                    title="Next Meeting"
-                    description="Meeting with Mr. Hatim Tai (Team Lead)"
+                    title="Next Upcoming Session"
+                    description="Meeting with the Supervisor to discuss the project progress and get feedback."
                     footer="Tomorrow at 2:00 PM"
                     icon={Calendar}
                 />
                 <DashboardCard
                     title="Recent Activity"
-                    description="Presented the project to the client, received their feedback, and made the necessary improvements."
+                    description="Presented the a demo of the project , received their feedback, and made the necessary improvements."
                     footer="2 hours ago"
                     icon={Clock}
                 />

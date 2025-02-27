@@ -27,8 +27,8 @@ export default function SDGPAdminDashboard() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <DashboardCard
-                    title="Next Session"
-                    description="Meeting with John Doe"
+                    title="Next Upcoming Session"
+                    description="Meeting with the module team"
                     footer="Today at 3:00 PM"
                     icon={Calendar}
                 />
