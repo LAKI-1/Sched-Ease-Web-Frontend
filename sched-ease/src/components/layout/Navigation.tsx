@@ -1,127 +1,68 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import { Menu, LogOut, Calendar, Users, MessageSquare, Clock } from 'lucide-react';
+import { Link, useLocation } from 'react-router-dom';
+import { Calendar, Users, Settings, Home, Clock, MessageSquare } from 'lucide-react';
+import { cn } from '../../lib/utils';
+import { useAuthStore } from '../../lib/store/authStore';
 
-interface NavigationProps {
-    role: string;
-    onLogout: () => void;
-}
+const studentLinks = [
+    { name: 'Dashboard', href: '/dashboard', icon: Home },
+    { name: 'Feedback Session', href: '/feedbackSession', icon: Calendar },
+    { name: 'Group', href: '/groups', icon: Users },
+    { name: 'Feedback', href: '/feedback', icon: MessageSquare},
+    { name: 'Settings', href: '/settings', icon: Settings }
+];
 
-export function Navigation({ role, onLogout }: NavigationProps) {
-    const [isOpen, setIsOpen] = React.useState(false);
+const lecturerLinks = [
+    { name: 'Dashboard', href: '/dashboard', icon: Home },
+    { name: 'Availability', href: '/availability', icon: Clock },
+    { name: 'Schedule', href: '/schedule', icon: Calendar },
+    { name: 'Teams', href: '/teams', icon: Users },
+    { name: 'Feedback', href: '/feedback', icon: MessageSquare},
+    { name: 'Settings', href: '/settings', icon: Settings }
+];
 
-    const getNavItems = () => {
-        switch (role) {
-            case 'administrator':
-                return [
-                    { icon: <Calendar size={20} />, label: 'Timetables', href: '/timetables' }
-                ];
-            case 'sdgp_administrator':
-                return [
-                    { icon: <Calendar size={20} />, label: 'Master Calendar', href: '/master-calendar' },
-                    { icon: <Users size={20} />, label: 'Lecturers', href: '/lecturers' },
-                    { icon: <Users size={20} />, label: 'Teams', href: '/teams' },
-                    { icon: <MessageSquare size={20} />, label: 'Feedback', href: '/feedback' },
-                    { icon: <MessageSquare size={20} />, label: 'Chat', href: '/chat' }
-                ];
-            case 'lecturer':
-                return [
-                    { icon: <Clock size={20} />, label: 'Availability', href: '/availability' },
-                    { icon: <Calendar size={20} />, label: 'Sessions', href: '/sessions' },
-                    { icon: <Users size={20} />, label: 'Teams', href: '/teams' },
-                    { icon: <MessageSquare size={20} />, label: 'Feedback', href: '/feedback' },
-                    { icon: <MessageSquare size={20} />, label: 'Chat', href: '/chat' }
-                ];
-            case 'student':
-                return [
-                    { icon: <Users size={20} />, label: 'My Group', href: '/group' },
-                    { icon: <Calendar size={20} />, label: 'Book Sessions', href: '/book' },
-                    { icon: <MessageSquare size={20} />, label: 'Feedback', href: '/feedback' },
-                    { icon: <MessageSquare size={20} />, label: 'Chat', href: '/chat' }
-                ];
-            default:
-                return [];
-        }
-    };
+const sdgpAdminLinks = [
+    { name: 'Dashboard', href: '/dashboard', icon: Home },
+    { name: 'Master Calendar', href: '/masterCalendar', icon: Calendar },
+    { name: 'Teams', href: '/teams', icon: Users },
+    { name: 'Lecturers', href: '/lecturers', icon: Users },
+    { name: 'Feedback', href: '/feedback', icon: MessageSquare},
+    { name: 'Settings', href: '/settings', icon: Settings }
+];
+
+const adminLinks = [
+    { name: 'Dashboard', href: '/dashboard', icon: Home },
+    { name: 'Timetable', href: '/timetable', icon: Calendar },
+    { name: 'Settings', href: '/settings', icon: Settings }
+];
+
+export default function Navigation() {
+    const location = useLocation();
+    const user = useAuthStore((state) => state.user);
+
+    const links = user?.role === 'student' ? studentLinks :
+        user?.role === 'lecturer' ? lecturerLinks :
+            user?.role === 'sdgp_admin' ? sdgpAdminLinks : adminLinks;
 
     return (
-        <nav className="bg-white">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="flex items-center justify-between h-16">
-                    <div className="flex items-center">
-                        <div className="flex-shrink-0">
-                            <Link to="/" className="text-[#3E8498] font-bold text-xl">Sched-Ease</Link>
-                        </div>
-                        <div className="hidden md:block flex-grow">
-                            <div className="ml-10 flex items-center space-x-4">
-                                <Link
-                                    to="/"
-                                    className="text-[#3E8498] hover:text-[#346e7e] px-3 py-2 rounded-md text-sm font-medium"
-                                >
-                                    Dashboard
-                                </Link>
-                                {getNavItems().map((item) => (
-                                    <Link
-                                        key={item.href}
-                                        to={item.href}
-                                        className="text-[#3E8498] hover:text-[#346e7e] px-3 py-2 rounded-md text-sm font-medium flex items-center gap-2"
-                                    >
-                                        {item.icon}
-                                        {item.label}
-                                    </Link>
-                                ))}
-                            </div>
-                        </div>
-                    </div>
-                    <div className="hidden md:flex items-center">
-                        <button
-                            onClick={onLogout}
-                            className="flex items-center text-[#3E8498] hover:text-[#346e7e] px-3 py-2 rounded-md text-sm font-medium"
-                        >
-                            <LogOut size={20} className="mr-2" />
-                            Logout
-                        </button>
-                    </div>
-                    <div className="md:hidden">
-                        <button
-                            onClick={() => setIsOpen(!isOpen)}
-                            className="text-[#3E8498] hover:text-[#346e7e] p-2 rounded-md"
-                        >
-                            <Menu size={24} />
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            {isOpen && (
-                <div className="md:hidden">
-                    <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-                        <Link
-                            to="/"
-                            className="text-[#3E8498] hover:text-[#346e7e] block px-3 py-2 rounded-md text-base font-medium"
-                        >
-                            Dashboard
-                        </Link>
-                        {getNavItems().map((item) => (
-                            <Link
-                                key={item.href}
-                                to={item.href}
-                                className="text-[#3E8498] hover:text-[#346e7e] block px-3 py-2 rounded-md text-base font-medium flex items-center gap-2"
-                            >
-                                {item.icon}
-                                {item.label}
-                            </Link>
-                        ))}
-                        <button
-                            onClick={onLogout}
-                            className="text-[#3E8498] hover:text-[#346e7e] w-full text-left px-3 py-2 rounded-md text-base font-medium flex items-center gap-2"
-                        >
-                            <LogOut size={20} />
-                            Logout
-                        </button>
-                    </div>
-                </div>
-            )}
+        <nav className="hidden md:flex items-center space-x-4">
+            {links.map((link) => {
+                const Icon = link.icon;
+                return (
+                    <Link
+                        key={link.name}
+                        to={link.href}
+                        className={cn(
+                            'flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium',
+                            location.pathname === link.href
+                                ? 'bg-blue-50 text-blue-700'
+                                : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                        )}
+                    >
+                        <Icon className="h-5 w-5" />
+                        <span>{link.name}</span>
+                    </Link>
+                );
+            })}
         </nav>
     );
 }
