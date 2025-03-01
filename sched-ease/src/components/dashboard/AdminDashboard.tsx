@@ -32,12 +32,6 @@ export default function AdminDashboard() {
                     footer="Click to start"
                     icon={Calendar}
                 />
-                <DashboardCard
-                    title="Upcoming Timetable Updates"
-                    description="Review and adjust existing timetables."
-                    footer="Review now"
-                    icon={Clock}
-                />
             </div>
         </div>
     );
