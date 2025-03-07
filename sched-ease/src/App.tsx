@@ -3,7 +3,6 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { useAuthStore } from './lib/store/authStore';
 import LoginForm from './components/auth/LoginForm';
 import Header from './components/layout/Header';
-import FeedbackSchedulePage from './components/schedule/FeedbackSchedulePage';
 import AdminDashboard from './components/dashboard/AdminDashboard';
 import SDGPAdminDashboard from './components/dashboard/SDGPAdminDashboard';
 import StudentDashboard from './components/dashboard/StudentDashboard';
@@ -12,9 +11,9 @@ import LecturerListPage from './components/users/LecturerListPage';
 import GroupListPage from './components/users/GroupListPage';
 import TeamListPage from './components/users/TeamListPage';
 import Availability from './components/schedule/Availability';
-import FeedbackSession from './components/schedule/FeedbackSesssion';
 import { Timetable } from './components/schedule/Timetable';
 import { Feedback } from './components/folder/Feedback';
+import { MasterCalendar } from './components/schedule/MasterCalendar';
 import SettingsPage from './components/settings/SettingsPage';
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -52,18 +51,6 @@ function App() {
                         }
                         />
 
-                        {/* Protected Route for Schedule Pages */}
-                        <Route path="/schedule" element={
-                            <ProtectedRoute>
-                                {user?.role === 'student' || user?.role === 'lecturer' || user?.role === 'sdgp_admin' ? (
-                                    <FeedbackSchedulePage />
-                                ) : (
-                                    <Navigate to="/dashboard" />
-                                )}
-                            </ProtectedRoute>
-                        }
-                        />
-
                         <Route path="/lecturers" element={
                             <ProtectedRoute>
                                 <LecturerListPage />
@@ -74,6 +61,13 @@ function App() {
                         <Route path="/availability" element={
                             <ProtectedRoute>
                                 <Availability />
+                            </ProtectedRoute>
+                        }
+                        />
+
+                        <Route path="/master-calendar" element={
+                            <ProtectedRoute>
+                                <MasterCalendar />
                             </ProtectedRoute>
                         }
                         />
@@ -99,19 +93,19 @@ function App() {
                         }
                         />
 
-                        <Route path="/feedbackSession" element={
-                            <ProtectedRoute>
-                                <FeedbackSession />
-                            </ProtectedRoute>
-                        }
-                        />
-
                         <Route path="/feedback" element={
                             <ProtectedRoute>
                                 <Feedback role={user?.role === 'sdgp_admin' ? 'sdgp_admin' : 'lecturer'} />
                             </ProtectedRoute>
                         }
                         />
+
+                        {/* <Route path="/chat" element={
+                <ProtectedRoute>
+                  <Chat />
+                </ProtectedRoute>
+              }
+            /> */}
 
                         {/* Settings Page */}
                         <Route path="/settings" element={
