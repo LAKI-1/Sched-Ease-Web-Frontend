@@ -1,22 +1,9 @@
 import React from 'react';
-import { Users, Plus, ChevronRight } from 'lucide-react';
+import { Plus, ChevronRight } from 'lucide-react';
 import type { UserRole } from '../../types/auth';
 
 interface FeedbackProps {
     role: UserRole;
-}
-
-interface TeamMember {
-    name: string;
-    studentId: string;
-    tutorialGroup: string;
-    isLeader?: boolean;
-}
-
-interface Team {
-    id: string;
-    teamId: string;
-    members: TeamMember[];
 }
 
 interface FeedbackItem {
@@ -34,30 +21,7 @@ export function Feedback({ role }: FeedbackProps) {
     const [feedbackContent, setFeedbackContent] = React.useState('');
 
     // Mock data - in a real app, this would come from your database
-    const teams: Team[] = [
-        {
-            id: '1',
-            teamId: 'CS-20',
-            members: [
-                { name: 'John Smith', studentId: 'ST12345', tutorialGroup: 'CS-G1', isLeader: true },
-                { name: 'Sarah Johnson', studentId: 'ST12346', tutorialGroup: 'CS-G2' },
-                { name: 'Michael Lee', studentId: 'ST12347', tutorialGroup: 'CS-G1' },
-                { name: 'Emily Brown', studentId: 'ST12348', tutorialGroup: 'CS-G3' },
-                { name: 'David Wilson', studentId: 'ST12349', tutorialGroup: 'CS-G2' }
-            ]
-        },
-        {
-            id: '2',
-            teamId: 'SE-10',
-            members: [
-                { name: 'James Chen', studentId: 'ST12350', tutorialGroup: 'SE-G1', isLeader: true },
-                { name: 'Emma Davis', studentId: 'ST12351', tutorialGroup: 'SE-G2' },
-                { name: 'William Taylor', studentId: 'ST12352', tutorialGroup: 'SE-G3' },
-                { name: 'Sophia Martinez', studentId: 'ST12353', tutorialGroup: 'SE-G1' },
-                { name: 'Oliver Anderson', studentId: 'ST12354', tutorialGroup: 'SE-G2' }
-            ]
-        }
-    ];
+    const teams = ['CS-20', 'SE-10'];
 
     const feedbacks: FeedbackItem[] = [
         {
@@ -89,7 +53,7 @@ export function Feedback({ role }: FeedbackProps) {
     const canViewAllTeams = role === 'sdgp_admin' || role === 'lecturer';
     const userTeam = 'CS-20'; // In a real app, this would come from user context
 
-    const visibleTeams = canViewAllTeams ? teams : teams.filter(t => t.teamId === userTeam);
+    const visibleTeams = canViewAllTeams ? teams : [userTeam];
     const selectedTeamFeedbacks = selectedTeam
         ? feedbacks.filter(f => f.teamId === selectedTeam)
         : [];
@@ -102,9 +66,6 @@ export function Feedback({ role }: FeedbackProps) {
     };
 
     if (selectedTeam) {
-        const team = teams.find(t => t.teamId === selectedTeam);
-        if (!team) return null;
-
         return (
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                 <div className="mb-8">
@@ -121,8 +82,8 @@ export function Feedback({ role }: FeedbackProps) {
                     <div className="p-6">
                         <div className="flex justify-between items-start mb-6">
                             <div>
-                                <h2 className="text-2xl font-semibold text-gray-900">{team.teamId}</h2>
-                                <p className="text-gray-600 mt-1">Team Details</p>
+                                <h2 className="text-2xl font-semibold text-gray-900">Team {selectedTeam}</h2>
+                                <p className="text-gray-600 mt-1">Feedback History</p>
                             </div>
                             {canViewAllTeams && (
                                 <button
@@ -133,30 +94,6 @@ export function Feedback({ role }: FeedbackProps) {
                                     Add Feedback
                                 </button>
                             )}
-                        </div>
-
-                        <div className="border-t pt-6">
-                            <h3 className="text-lg font-semibold mb-4">Team Members</h3>
-                            <div className="grid gap-4">
-                                {team.members.map((member, index) => (
-                                    <div key={index} className="bg-gray-50 p-4 rounded-lg">
-                                        <div className="flex justify-between items-center">
-                                            <div>
-                                                <p className="font-medium flex items-center gap-2">
-                                                    {member.name}
-                                                    {member.isLeader && (
-                                                        <span className="text-xs bg-indigo-100 text-indigo-800 px-2 py-1 rounded">
-                                                            Team Leader
-                                                        </span>
-                                                    )}
-                                                </p>
-                                                <p className="text-gray-600 text-sm">ID: {member.studentId}</p>
-                                            </div>
-                                            <span className="text-gray-600">{member.tutorialGroup}</span>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -198,7 +135,6 @@ export function Feedback({ role }: FeedbackProps) {
 
                 <div className="bg-white shadow rounded-lg">
                     <div className="p-6">
-                        <h3 className="text-lg font-semibold mb-4">Feedback History</h3>
                         <div className="space-y-6">
                             {selectedTeamFeedbacks.map((feedback) => (
                                 <div key={feedback.id} className="border-b last:border-b-0 pb-6 last:pb-0">
@@ -231,25 +167,24 @@ export function Feedback({ role }: FeedbackProps) {
     return (
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <div className="flex items-center gap-3 mb-8">
-                <h2 className="text-2xl font-semibold text-gray-900">Teams & Feedback</h2>
+                <h2 className="text-2xl font-semibold text-gray-900">Team Feedback</h2>
             </div>
 
             <div className="grid gap-6">
-                {visibleTeams.map((team) => (
-                    <div key={team.id} className="bg-white shadow rounded-lg p-6">
-                        <div className="flex justify-between items-start">
-                            <div className="flex items-start gap-4">
-                                <Users className="w-12 h-12 text-indigo-600" />
-                                <div>
-                                    <h3 className="text-lg font-semibold">{team.teamId}</h3>
-                                    <p className="text-gray-600">{team.members.length} members</p>
-                                </div>
+                {visibleTeams.map((teamId) => (
+                    <div key={teamId} className="bg-white shadow rounded-lg p-6">
+                        <div className="flex justify-between items-center">
+                            <div>
+                                <h3 className="text-lg font-semibold">Team {teamId}</h3>
+                                <p className="text-gray-600">
+                                    {feedbacks.filter(f => f.teamId === teamId).length} feedback entries
+                                </p>
                             </div>
                             <button
-                                onClick={() => setSelectedTeam(team.teamId)}
+                                onClick={() => setSelectedTeam(teamId)}
                                 className="flex items-center gap-2 text-indigo-600 hover:text-indigo-800"
                             >
-                                View Details
+                                View Feedback
                                 <ChevronRight className="w-5 h-5" />
                             </button>
                         </div>
