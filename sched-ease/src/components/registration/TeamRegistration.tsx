@@ -1,139 +1,156 @@
-import React from 'react';
+import { useState } from 'react';
+import { Search, UserPlus, Check, X } from 'lucide-react';
 
-const existingTeams = {
-    CS: ['01', '02'],
-    SE: ['01']
-};
+interface Student {
+    id: string;
+    name: string;
+    email: string;
+}
 
-const tutorialGroups = [
-    ...Array(10).fill(null).map((_, i) => ({ id: `CS-G${i + 1}`, name: `CS-G${i + 1}` })),
-    ...Array(10).fill(null).map((_, i) => ({ id: `SE-G${i + 1}`, name: `SE-G${i + 1}` }))
+interface Team {
+    members: Student[];
+    confirmed: boolean;
+}
+
+const mockStudents: Student[] = [
+    { id: "1", name: "John Doe", email: "john@example.com" },
+    { id: "2", name: "Jane Smith", email: "jane@example.com" },
+    { id: "3", name: "Alice Johnson", email: "alice@example.com" },
+    { id: "4", name: "Bob Wilson", email: "bob@example.com" },
+    { id: "5", name: "Carol Brown", email: "carol@example.com" },
+    { id: "6", name: "David Lee", email: "david@example.com" },
+    { id: "7", name: "Eva Garcia", email: "eva@example.com" },
+    { id: "8", name: "Frank Miller", email: "frank@example.com" },
 ];
 
 export function TeamRegistration() {
-    const [registrationData, setRegistrationData] = React.useState({
-        teamType: 'CS',
-        members: Array(6).fill({ name: '', studentId: '', email: '', tutorialGroup: '' })
-    });
+    const [searchTerm, setSearchTerm] = useState('');
+    const [team, setTeam] = useState<Team>({ members: [], confirmed: false });
+    const [error, setError] = useState<string>('');
 
-    const getNextTeamId = (type: 'CS' | 'SE') => {
-        const existingIds = existingTeams[type];
-        const lastId = existingIds[existingIds.length - 1];
-        const nextNumber = (parseInt(lastId) + 1).toString().padStart(2, '0');
-        return `${type}-${nextNumber}`;
-    };
-
-    const handleRegistration = (e: React.FormEvent) => {
-        e.preventDefault();
-        const nextTeamId = getNextTeamId(registrationData.teamType as 'CS' | 'SE');
-        console.log('Registering team:', nextTeamId);
-    };
-
-    const filteredTutorialGroups = tutorialGroups.filter(group =>
-        group.id.startsWith(registrationData.teamType)
+    const filteredStudents = mockStudents.filter(student =>
+        (student.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            student.email.toLowerCase().includes(searchTerm.toLowerCase())) &&
+        !team.members.find(member => member.id === student.id)
     );
 
+    const addToTeam = (student: Student) => {
+        if (team.members.length >= 6) {
+            setError('Maximum team size is 6 members');
+            return;
+        }
+        setTeam(prev => ({
+            ...prev,
+            members: [...prev.members, student]
+        }));
+        setError('');
+    };
+
+    const removeFromTeam = (studentId: string) => {
+        setTeam(prev => ({
+            ...prev,
+            members: prev.members.filter(member => member.id !== studentId)
+        }));
+    };
+
+    const confirmTeam = () => {
+        if (team.members.length !== 6) {
+            setError('Team must have exactly 6 members');
+            return;
+        }
+        setTeam(prev => ({ ...prev, confirmed: true }));
+        setError('');
+        // Here you would typically make an API call to save the team
+    };
+
+    if (team.confirmed) {
+        return (
+            <div className="bg-white p-6 rounded-lg shadow-md">
+                <div className="flex items-center justify-between mb-6">
+                    <h2 className="text-2xl font-bold text-green-600">Team Confirmed!</h2>
+                    <Check className="w-8 h-8 text-green-600" />
+                </div>
+                <div className="space-y-4">
+                    {team.members.map(member => (
+                        <div key={member.id} className="flex items-center justify-between p-3 bg-green-50 rounded-md">
+                            <div>
+                                <p className="font-semibold">{member.name}</p>
+                                <p className="text-sm text-gray-600">{member.email}</p>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </div>
+        );
+    }
+
     return (
-        <div className="min-h-screen flex items-center justify-center py-1 px-4 sm:px-6 lg:px-12">
-            <div className="max-w-2xl w-full bg-white rounded-lg shadow-md p-8">
-                <div className="flex flex-col items-center mb-8">
-                    <h2 className="mt-4 text-2xl font-bold text-gray-900">Team Registration</h2>
-                    <p className="mt-2 text-gray-600">Register your SDGP team</p>
+        <div className="space-y-6">
+            <div className="bg-white p-6 rounded-lg shadow-md">
+                <h2 className="text-2xl font-bold mb-6">Team Registration</h2>
+
+                {/* Search Bar */}
+                <div className="relative mb-6">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                    <input
+                        type="text"
+                        placeholder="Search students by name or email..."
+                        className="w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                    />
                 </div>
 
-                <form onSubmit={handleRegistration} className="space-y-6">
-                    <div className="grid grid-cols-2 gap-4">
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700">Team Type</label>
-                            <select
-                                value={registrationData.teamType}
-                                onChange={(e) => setRegistrationData({ ...registrationData, teamType: e.target.value })}
-                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                            >
-                                <option value="CS">CS</option>
-                                <option value="SE">SE</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div className="space-y-4">
-                        <h3 className="text-lg font-medium text-gray-900">Team Members</h3>
-                        {registrationData.members.map((member, index) => (
-                            <div key={index} className="grid grid-cols-1 gap-4 sm:grid-cols-4 border-b pb-6">
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700">Name</label>
-                                    <input
-                                        type="text"
-                                        value={member.name}
-                                        onChange={(e) => {
-                                            const newMembers = [...registrationData.members];
-                                            newMembers[index] = { ...member, name: e.target.value };
-                                            setRegistrationData({ ...registrationData, members: newMembers });
-                                        }}
-                                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                                        required
-                                    />
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700">Student ID</label>
-                                    <input
-                                        type="text"
-                                        value={member.studentId}
-                                        onChange={(e) => {
-                                            const newMembers = [...registrationData.members];
-                                            newMembers[index] = { ...member, studentId: e.target.value };
-                                            setRegistrationData({ ...registrationData, members: newMembers });
-                                        }}
-                                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                                        required
-                                    />
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700">Student Email</label>
-                                    <input
-                                        type="email"
-                                        value={member.email}
-                                        onChange={(e) => {
-                                            const newMembers = [...registrationData.members];
-                                            newMembers[index] = { ...member, email: e.target.value };
-                                            setRegistrationData({ ...registrationData, members: newMembers });
-                                        }}
-                                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                                        required
-                                    />
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700">Tutorial Group</label>
-                                    <select
-                                        value={member.tutorialGroup}
-                                        onChange={(e) => {
-                                            const newMembers = [...registrationData.members];
-                                            newMembers[index] = { ...member, tutorialGroup: e.target.value };
-                                            setRegistrationData({ ...registrationData, members: newMembers });
-                                        }}
-                                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                                        required
-                                    >
-                                        <option value="">Select Tutorial Group</option>
-                                        {filteredTutorialGroups.map(group => (
-                                            <option key={group.id} value={group.id}>
-                                                {group.name}
-                                            </option>
-                                        ))}
-                                    </select>
-                                </div>
+                {/* Student List */}
+                <div className="space-y-2 mb-6">
+                    {filteredStudents.map(student => (
+                        <div key={student.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-md hover:bg-gray-100">
+                            <div>
+                                <p className="font-semibold">{student.name}</p>
+                                <p className="text-sm text-gray-600">{student.email}</p>
                             </div>
-                        ))}
-                    </div>
-                    <div className="flex justify-end gap-3">
-                        <button type="button" className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">
-                            Cancel
-                        </button>
-                        <button type="submit" className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">
-                            Register Team
-                        </button>
-                    </div>
-                </form>
+                            <button
+                                onClick={() => addToTeam(student)}
+                                className="p-2 text-blue-600 hover:bg-blue-50 rounded-full"
+                            >
+                                <UserPlus className="w-5 h-5" />
+                            </button>
+                        </div>
+                    ))}
+                </div>
+            </div>
+
+            {/* Selected Team Members */}
+            <div className="bg-white p-6 rounded-lg shadow-md">
+                <h3 className="text-xl font-bold mb-4">Selected Team Members ({team.members.length}/6)</h3>
+                {error && <p className="text-red-500 mb-4">{error}</p>}
+                <div className="space-y-3 mb-6">
+                    {team.members.map(member => (
+                        <div key={member.id} className="flex items-center justify-between p-3 bg-blue-50 rounded-md">
+                            <div>
+                                <p className="font-semibold">{member.name}</p>
+                                <p className="text-sm text-gray-600">{member.email}</p>
+                            </div>
+                            <button
+                                onClick={() => removeFromTeam(member.id)}
+                                className="p-2 text-red-600 hover:bg-red-50 rounded-full"
+                            >
+                                <X className="w-5 h-5" />
+                            </button>
+                        </div>
+                    ))}
+                </div>
+                <button
+                    onClick={confirmTeam}
+                    disabled={team.members.length !== 6}
+                    className={`w-full py-2 px-4 rounded-lg font-semibold ${
+                        team.members.length === 6
+                            ? 'bg-blue-600 text-white hover:bg-blue-700'
+                            : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                    }`}
+                >
+                    Confirm Team
+                </button>
             </div>
         </div>
     );
