@@ -14,6 +14,7 @@ import Availability from './components/schedule/Availability';
 import { Timetable } from './components/schedule/Timetable';
 import { Feedback } from './components/folder/Feedback';
 import { MasterCalendar } from './components/schedule/MasterCalendar';
+import { TeamRegistration } from "./components/registration/TeamRegistration.tsx";
 import SettingsPage from './components/settings/SettingsPage';
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -100,12 +101,12 @@ function App() {
                         }
                         />
 
-                        {/* <Route path="/chat" element={
-                <ProtectedRoute>
-                  <Chat />
-                </ProtectedRoute>
-              }
-            /> */}
+                        <Route path="/team-registration" element={
+                            <ProtectedRoute>
+                                <TeamRegistration />
+                            </ProtectedRoute>
+                        }
+                        />
 
                         {/* Settings Page */}
                         <Route path="/settings" element={
