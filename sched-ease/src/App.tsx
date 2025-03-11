@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { useAuthStore } from './lib/store/authStore';
 import LoginForm from './components/auth/LoginForm';
@@ -17,15 +17,24 @@ import { MasterCalendar } from './components/schedule/MasterCalendar';
 import { TeamRegistration } from "./components/registration/TeamRegistration.tsx";
 import SchedulePage from './components/schedule/SchedulePage';
 import SettingsPage from './components/settings/SettingsPage';
+import SplashScreen from './components/Splash Screen/splashscreen';
 
-function ProtectedRoute({ children }: { children: React.ReactNode }) {
+const App: React.FC = () => {
+    const [loading, setLoading] = useState(true);
     const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
-    return isAuthenticated ? <>{children}</> : <Navigate to="/login" />;
-}
-
-function App() {
     const user = useAuthStore((state) => state.user);
-    const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+
+    useEffect(() => {
+        setTimeout(() => setLoading(false), 3000);
+    }, []);
+
+    if (loading) {
+        return <SplashScreen onDone={() => setLoading(false)} />;
+    }
+
+    function ProtectedRoute({ children }: { children: React.ReactNode }) {
+        return isAuthenticated ? <>{children}</> : <Navigate to="/login" />;
+    }
 
     return (
         <Router>
@@ -123,6 +132,14 @@ function App() {
                             </ProtectedRoute>
                         }
                         />
+                        <Route path="/lecturers" element={<ProtectedRoute><LecturerListPage /></ProtectedRoute>} />
+                        <Route path="/availability" element={<ProtectedRoute><Availability /></ProtectedRoute>} />
+                        <Route path="/master-calendar" element={<ProtectedRoute><MasterCalendar /></ProtectedRoute>} />
+                        <Route path="/groups" element={<ProtectedRoute><GroupListPage /></ProtectedRoute>} />
+                        <Route path="/timetable" element={<ProtectedRoute><Timetable /></ProtectedRoute>} />
+                        <Route path="/teams" element={<ProtectedRoute><TeamListPage /></ProtectedRoute>} />
+                        <Route path="/feedback" element={<ProtectedRoute><Feedback role={user?.role === 'sdgp_admin' ? 'sdgp_admin' : 'lecturer'} /></ProtectedRoute>} />
+                        <Route path="/settings" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />
 
                         {/* Default Redirect */}
                         <Route path="/" element={<Navigate to="/dashboard" />} />
@@ -131,6 +148,6 @@ function App() {
             </div>
         </Router>
     );
-}
+};
 
 export default App;
