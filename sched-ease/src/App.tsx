@@ -15,6 +15,7 @@ import { Timetable } from './components/schedule/Timetable';
 import { Feedback } from './components/folder/Feedback';
 import { MasterCalendar } from './components/schedule/MasterCalendar';
 import { TeamRegistration } from "./components/registration/TeamRegistration.tsx";
+import SchedulePage from './components/schedule/SchedulePage';
 import SettingsPage from './components/settings/SettingsPage';
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -83,6 +84,13 @@ function App() {
                         <Route  path="/timetable" element={
                             <ProtectedRoute>
                                 <Timetable />
+                            </ProtectedRoute>
+                        }
+                        />
+
+                        <Route  path="/schedule-page" element={
+                            <ProtectedRoute>
+                                <SchedulePage />
                             </ProtectedRoute>
                         }
                         />

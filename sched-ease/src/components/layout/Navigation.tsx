@@ -14,7 +14,7 @@ const studentLinks = [
 const lecturerLinks = [
     { name: 'Dashboard', href: '/dashboard', icon: Home },
     { name: 'Availability', href: '/availability', icon: Clock },
-    { name: 'Schedule', href: '/schedule', icon: Calendar },
+    { name: 'Schedule', href: '/schedule-page', icon: Calendar },
     { name: 'Teams', href: '/teams', icon: Users },
     { name: 'Feedback', href: '/feedback', icon: MessageSquare},
     { name: 'Settings', href: '/settings', icon: Settings }
