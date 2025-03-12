@@ -7,47 +7,24 @@ interface GroupSession {
     lecturer: string;
     module: string;
     date: string;
-    time: string;
+    startTime: string;
+    endTime: string;
     type: 'Lecture' | 'Tutorial';
     building: string;
     classroom: string;
 }
 
-const initialSessions: GroupSession[] = [
-    {
-        id: '1',
-        group: 'CS-G1',
-        lecturer: 'Ms. Sarah Wilson',
-        module: '5COS01',
-        date: 'Monday',
-        time: '09:00',
-        type: 'Lecture',
-        building: 'Engineering Block A',
-        classroom: 'Room 101'
-    },
-    {
-        id: '2',
-        group: 'CS-G2',
-        lecturer: 'Mr. James Chen',
-        module: '5COS10',
-        date: 'Tuesday',
-        time: '11:00',
-        type: 'Tutorial',
-        building: 'Computer Science Block',
-        classroom: 'Room 202'
-    }
-];
-
 export function Timetable() {
     const [selectedGroup, setSelectedGroup] = useState<string>('CS-G1');
-    const [sessions, setSessions] = useState<GroupSession[]>(initialSessions);
+    const [sessions, setSessions] = useState<GroupSession[]>([]);
     const [newSession, setNewSession] = useState<GroupSession>({
         id: '',
         group: selectedGroup,
         lecturer: '',
         module: '',
         date: 'Monday',
-        time: '09:00',
+        startTime: '',
+        endTime: '',
         type: 'Lecture',
         building: '',
         classroom: ''
@@ -67,7 +44,8 @@ export function Timetable() {
                 lecturer: '',
                 module: '',
                 date: 'Monday',
-                time: '09:00',
+                startTime: '',
+                endTime: '',
                 type: 'Lecture',
                 building: '',
                 classroom: ''
@@ -134,10 +112,22 @@ export function Timetable() {
                         </select>
                     </div>
                     <div>
-                        <label className="block text-sm font-medium text-gray-700">Time</label>
+                        <label className="block text-sm font-medium text-gray-700">Start Time</label>
                         <select
-                            value={newSession.time}
-                            onChange={(e) => setNewSession({ ...newSession, time: e.target.value })}
+                            value={newSession.startTime}
+                            onChange={(e) => setNewSession({ ...newSession, startTime: e.target.value })}
+                            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                        >
+                            {times.map(time => (
+                                <option key={time} value={time}>{time}</option>
+                            ))}
+                        </select>
+                    </div>
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700">End Time</label>
+                        <select
+                            value={newSession.endTime}
+                            onChange={(e) => setNewSession({ ...newSession, endTime: e.target.value })}
                             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                         >
                             {times.map(time => (
@@ -196,7 +186,7 @@ export function Timetable() {
                             <React.Fragment key={time}>
                                 <div className="py-3 font-medium text-gray-600">{time}</div>
                                 {days.map(day => {
-                                    const session = filteredSessions.find(s => s.time === time && s.date === day);
+                                    const session = filteredSessions.find(s => s.startTime === time && s.date === day);
                                     return (
                                         <div
                                             key={`${time}-${day}`}
@@ -226,6 +216,9 @@ export function Timetable() {
                                                     <div className="flex items-center gap-1 text-gray-600">
                                                         <MapPin size={14} />
                                                         <span className="truncate">{session.building}, {session.classroom}</span>
+                                                    </div>
+                                                    <div className="text-xs text-gray-500 mt-1">
+                                                        {session.startTime} - {session.endTime}
                                                     </div>
                                                 </div>
                                             )}
