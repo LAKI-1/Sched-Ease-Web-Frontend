@@ -1,4 +1,4 @@
-import { Calendar, Clock, Award, TrendingUp, Bell, MessageSquare, Users, LucideIcon } from 'lucide-react';
+import { Calendar, Clock, Award, TrendingUp, Bell, MessageSquare, Users, LucideIcon, Video, ExternalLink } from 'lucide-react';
 import DashboardStats from './DashboardStats';
 import { useAuthStore } from '../../lib/store/authStore';
 import { useState, useEffect } from 'react';
@@ -17,6 +17,7 @@ interface DashboardCardProps {
     icon: LucideIcon;
     accentColor?: string;
     actions?: ActionButton[];
+    link?: string;
 }
 
 function DashboardCard({
@@ -25,7 +26,8 @@ function DashboardCard({
                            footer,
                            icon: Icon,
                            accentColor = 'bg-blue-600',
-                           actions = []
+                           actions = [],
+                           link
                        }: DashboardCardProps) {
     return (
         <div className="bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-shadow overflow-hidden h-full flex flex-col">
@@ -38,6 +40,17 @@ function DashboardCard({
                     <h3 className="font-medium text-gray-900">{title}</h3>
                 </div>
                 <p className="text-gray-600 text-sm">{description}</p>
+
+                {link && (
+                    <a
+                        href={link}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1 mt-3 text-blue-600 hover:text-blue-800 text-sm font-medium"
+                    >
+                        Join lecture <ExternalLink className="w-3 h-3" />
+                    </a>
+                )}
             </div>
             <div className="border-t border-gray-100 bg-gray-50 px-5 py-3 flex items-center justify-between">
                 <p className="text-xs text-gray-500">{footer}</p>
@@ -66,6 +79,12 @@ export default function StudentDashboard() {
     const user = useAuthStore((state) => state.user);
     const [greeting, setGreeting] = useState('');
     const [quote, setQuote] = useState('');
+    const [nextLecture, setNextLecture] = useState({
+        title: 'SDGP Weekly Lecture',
+        topic: 'UI/UX Principles',
+        time: 'Tuesday at 10:00 AM',
+        countdown: ''
+    });
 
     // Get appropriate greeting based on time of day
     useEffect(() => {
@@ -83,6 +102,43 @@ export default function StudentDashboard() {
             "The best way to predict your future is to create it."
         ];
         setQuote(quotes[Math.floor(Math.random() * quotes.length)]);
+
+        // Update countdown to next lecture
+        const updateCountdown = () => {
+            const now = new Date();
+            const lectureDay = 2; // Tuesday (0 = Sunday, 2 = Tuesday)
+            const lectureHour = 10;
+            const lectureMinute = 0;
+
+            let nextLectureDate = new Date(now);
+            nextLectureDate.setDate(now.getDate() + (lectureDay + 7 - now.getDay()) % 7);
+            nextLectureDate.setHours(lectureHour, lectureMinute, 0, 0);
+
+            if (nextLectureDate <= now) {
+                nextLectureDate.setDate(nextLectureDate.getDate() + 7);
+            }
+
+            const diffMs = nextLectureDate.getTime() - now.getTime();
+            const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+            const diffHours = Math.floor((diffMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const diffMinutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+
+            let countdownText = '';
+            if (diffDays > 0) {
+                countdownText = `${diffDays}d ${diffHours}h remaining`;
+            } else if (diffHours > 0) {
+                countdownText = `${diffHours}h ${diffMinutes}m remaining`;
+            } else {
+                countdownText = `${diffMinutes}m remaining`;
+            }
+
+            setNextLecture(prev => ({...prev, countdown: countdownText}));
+        };
+
+        updateCountdown();
+        const intervalId = setInterval(updateCountdown, 60000); // Update every minute
+
+        return () => clearInterval(intervalId);
     }, []);
 
     const totalLectures = 20; // Total number of lectures
@@ -145,11 +201,15 @@ export default function StudentDashboard() {
 
                 <div>
                     <DashboardCard
-                        title="Project Highlights"
-                        description="Your team has completed 8 tasks this week, putting you ahead of schedule!"
-                        footer="Updated today"
-                        icon={Award}
+                        title="Weekly SDGP Lecture"
+                        description="Live session on UI/UX principles. Join via Microsoft Teams."
+                        footer={`${nextLecture.time} • ${nextLecture.countdown}`}
+                        icon={Video}
                         accentColor="bg-gradient-to-r from-green-500 to-emerald-600"
+                        link="https://teams.microsoft.com/l/meetup-join/SDGP-weekly-lecture"
+                        actions={[
+                            { label: 'Add to Calendar', icon: Calendar }
+                        ]}
                     />
                 </div>
 
