@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { LogIn } from 'lucide-react';
 import { useAuthStore } from '../../lib/store/authStore';
 import { loginUser } from '../../lib/api/auth';
 import { UserRole } from '../../types/auth';
 import Button from '../ui/Button';
 import Input from '../ui/Input';
+import Logo from '../../assets/SchedEase.png';
 
 export default function LoginForm() {
     const [email, setEmail] = useState('');
@@ -14,6 +15,14 @@ export default function LoginForm() {
     const [error, setError] = useState('');
 
     const login = useAuthStore((state) => state.login);
+
+    // Disable scrolling when the login form is displayed
+    useEffect(() => {
+        document.body.style.overflow = 'hidden';
+        return () => {
+            document.body.style.overflow = '';
+        };
+    }, []);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -31,29 +40,35 @@ export default function LoginForm() {
     };
 
     return (
-        <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
-            <div className="sm:mx-auto sm:w-full sm:max-w-md">
-                <div className="flex justify-center">
-                    <LogIn className="h-12 w-12 text-blue-700" />
+        <div className="h-screen flex overflow-hidden">
+            {/* Left Side - Logo with Full Background Coverage */}
+            <div className="hidden lg:flex items-center justify-center w-1/2 bg-blue-100 border-r border-gray-200">
+                <div className="flex items-center justify-center w-full h-full">
+                    <img src={Logo} alt="Sched-Ease Logo" className="w-2/3 animate-fadeIn" />
                 </div>
-                <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-                    Sign in to Sched-Ease Portal
-                </h2>
             </div>
 
-            <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-                <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
+            {/* Right Side - Login Form */}
+            <div className="w-full lg:w-1/2 flex flex-col justify-center items-center p-8 sm:p-12 lg:p-16 bg-white border-l border-gray-200">
+                <div className="w-full max-w-md">
+                    <div className="text-center mb-8">
+                        <LogIn className="h-12 w-12 text-blue-700 mx-auto mb-2" />
+                        <h2 className="text-2xl font-bold text-gray-900">
+                            Sign in to <span className="text-blue-700">Sched-Ease</span> Portal
+                        </h2>
+                    </div>
+
                     {error && (
-                        <div className="mb-4 p-3 rounded bg-red-50 border border-red-200 text-red-600">
+                        <div className="p-3 bg-red-50 border border-red-200 text-red-600 text-sm rounded-md text-center mb-6">
                             {error}
                         </div>
                     )}
 
-                    <form className="space-y-6" onSubmit={handleSubmit}>
+                    <form className="space-y-5 w-full" onSubmit={handleSubmit}>
                         <Input
                             id="email"
                             type="email"
-                            label="Email address"
+                            label="Email Address"
                             required
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
@@ -68,43 +83,30 @@ export default function LoginForm() {
                             onChange={(e) => setPassword(e.target.value)}
                         />
 
+                        {/* Role Selection */}
                         <div>
                             <label className="block text-sm font-medium text-gray-700">Role</label>
                             <div className="mt-2 grid grid-cols-2 gap-3">
-                                <Button
-                                    type="button"
-                                    variant={role === 'student' ? 'primary' : 'secondary'}
-                                    onClick={() => setRole('student')}
-                                >
-                                    Student
-                                </Button>
-                                <Button
-                                    type="button"
-                                    variant={role === 'lecturer' ? 'primary' : 'secondary'}
-                                    onClick={() => setRole('lecturer')}
-                                >
-                                    Lecturer
-                                </Button>
-                                <Button
-                                    type="button"
-                                    variant={role === 'sdgp_admin' ? 'primary' : 'secondary'}
-                                    onClick={() => setRole('sdgp_admin')}
-                                >
-                                    SDGP Admin
-                                </Button>
-                                <Button
-                                    type="button"
-                                    variant={role === 'admin' ? 'primary' : 'secondary'}
-                                    onClick={() => setRole('admin')}
-                                >
-                                    Admin
-                                </Button>
+                                {['student', 'lecturer', 'sdgp_admin', 'admin'].map((r) => (
+                                    <Button
+                                        key={r}
+                                        type="button"
+                                        variant={role === r ? 'primary' : 'secondary'}
+                                        onClick={() => setRole(r as UserRole)}
+                                        className={`transition-all duration-300 ${
+                                            role === r ? 'bg-blue-700 text-white' : 'bg-gray-200 hover:bg-gray-300'
+                                        }`}
+                                    >
+                                        {r.charAt(0).toUpperCase() + r.slice(1).replace('_', ' ')}
+                                    </Button>
+                                ))}
                             </div>
                         </div>
 
+                        {/* Submit Button */}
                         <Button
                             type="submit"
-                            className="w-full"
+                            className="w-full bg-blue-700 text-white hover:bg-blue-800 transition-all duration-300"
                             isLoading={isLoading}
                         >
                             Sign in
