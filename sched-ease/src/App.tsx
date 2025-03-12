@@ -16,6 +16,7 @@ import { Feedback } from './components/folder/Feedback';
 import { MasterCalendar } from './components/schedule/MasterCalendar';
 import { TeamRegistration } from "./components/registration/TeamRegistration.tsx";
 import SettingsPage from './components/settings/SettingsPage';
+// import GoogleLogin from './components/google/googleLogin.tsx';
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
     const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
@@ -33,6 +34,7 @@ function App() {
                 <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
                     <Routes>
                         <Route path="/login" element={isAuthenticated ? <Navigate to="/dashboard" /> : <LoginForm />} />
+                        {/* <Route path="/google" element={<GoogleLogin />} /> */}
 
                         {/* Protected Route for Dashboards */}
                         <Route path="/dashboard" element={
@@ -80,7 +82,7 @@ function App() {
                         }
                         />
 
-                        <Route  path="/timetable" element={
+                        <Route path="/timetable" element={
                             <ProtectedRoute>
                                 <Timetable />
                             </ProtectedRoute>
