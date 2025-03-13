@@ -1,15 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { LogIn } from 'lucide-react';
 import { useAuthStore } from '../../lib/store/authStore';
-import { loginUser } from '../../lib/api/auth';
+import { loginUser, loginGoogleUser } from '../../lib/api/auth';
 import { UserRole } from '../../types/auth';
 import Button from '../ui/Button';
 import Input from '../ui/Input';
-import { createClient } from '@supabase/supabase-js';
+// import { createClient } from '@supabase/supabase-js';
+import { supabase } from '../../components/supabase/supabaseClient';
 
-const supabaseUrl: string = import.meta.env.VITE_SUPABASE_URL as string;
-const supabaseAnonKey: string = import.meta.env.VITE_SUPABASE_ANON_KEY as string;
-const supabase = createClient(supabaseUrl, supabaseAnonKey);
+// const supabaseUrl: string = import.meta.env.VITE_SUPABASE_URL as string;
+// const supabaseAnonKey: string = import.meta.env.VITE_SUPABASE_ANON_KEY as string;
+// const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 export default function LoginForm() {
     const [email, setEmail] = useState('');
@@ -52,13 +53,29 @@ export default function LoginForm() {
         setIsLoading(true);
 
         try {
-            const { data, error } = await supabase.auth.signInWithOAuth({ provider: 'google', options: { queryParams: { prompt: 'select_account', }, }, });
+            // const { data, error } = await supabase.auth.signInWithOAuth({ provider: 'google', options: { queryParams: { prompt: 'select_account', access_type: 'offline', }, }, });
+            const { data, error } = await supabase.auth.signInWithOAuth({
+                provider: 'google',
+                options: {
+                    queryParams: {
+                        prompt: 'select_account',
+                        access_type: 'offline',
+                    },
+                    // redirectTo: `${window.location.origin}/loginform`
+                    redirectTo: `${window.location.origin}/dashboard`
+                }
+            });
             console.log('OAuth Sign-In Data:', data);
             if (error) throw error;
 
             const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
             console.log('Session Data:', sessionData);
             if (sessionError) throw sessionError;
+
+            const user = await loginGoogleUser(sessionData?.session?.access_token as string, role);
+            console.log('SDGP User:', user);
+            login(user);
+
         } catch (err) {
             console.error('Google Sign-In Error:', err);
             setError(err instanceof Error ? err.message : 'Google Sign-In failed');

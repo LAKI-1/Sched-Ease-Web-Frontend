@@ -31,6 +31,8 @@ export const loginGoogleUser = async (
     role: UserRole
 ): Promise<User> => {
 
+    console.log("making req with token:", token, "for role:", role);
+
 
     // Simulate API delay
     const response = await postRequest(token, `api/v1/login/${role}-login`, {});

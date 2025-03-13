@@ -34,6 +34,7 @@ function App() {
                 <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
                     <Routes>
                         <Route path="/login" element={isAuthenticated ? <Navigate to="/dashboard" /> : <LoginForm />} />
+                        <Route path="/loginform" element={<LoginForm />} />
                         {/* <Route path="/google" element={<GoogleLogin />} /> */}
 
                         {/* Protected Route for Dashboards */}
