@@ -132,14 +132,6 @@ const App: React.FC = () => {
                             </ProtectedRoute>
                         }
                         />
-                        <Route path="/lecturers" element={<ProtectedRoute><LecturerListPage /></ProtectedRoute>} />
-                        <Route path="/availability" element={<ProtectedRoute><Availability /></ProtectedRoute>} />
-                        <Route path="/master-calendar" element={<ProtectedRoute><MasterCalendar /></ProtectedRoute>} />
-                        <Route path="/groups" element={<ProtectedRoute><GroupListPage /></ProtectedRoute>} />
-                        <Route path="/timetable" element={<ProtectedRoute><Timetable /></ProtectedRoute>} />
-                        <Route path="/teams" element={<ProtectedRoute><TeamListPage /></ProtectedRoute>} />
-                        <Route path="/feedback" element={<ProtectedRoute><Feedback role={user?.role === 'sdgp_admin' ? 'sdgp_admin' : 'lecturer'} /></ProtectedRoute>} />
-                        <Route path="/settings" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />
 
                         {/* Default Redirect */}
                         <Route path="/" element={<Navigate to="/dashboard" />} />
