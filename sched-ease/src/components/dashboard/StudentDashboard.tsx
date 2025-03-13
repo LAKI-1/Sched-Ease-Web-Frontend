@@ -34,8 +34,8 @@ function DashboardCard({
             <div className={`${accentColor} h-2`} />
             <div className="p-5 flex-1">
                 <div className="flex items-center gap-3 mb-3">
-                    <div className="bg-gray-100 p-2 rounded-lg">
-                        <Icon className="w-5 h-5 text-gray-700" />
+                    <div className="bg-blue-50 p-2 rounded-lg">
+                        <Icon className="w-5 h-5 text-blue-700" />
                     </div>
                     <h3 className="font-medium text-gray-900">{title}</h3>
                 </div>
@@ -52,8 +52,8 @@ function DashboardCard({
                     </a>
                 )}
             </div>
-            <div className="border-t border-gray-100 bg-gray-50 px-5 py-3 flex items-center justify-between">
-                <p className="text-xs text-gray-500">{footer}</p>
+            <div className="border-t border-blue-50 bg-blue-50 px-5 py-3 flex items-center justify-between">
+                <p className="text-xs text-blue-700">{footer}</p>
 
                 {actions.length > 0 && (
                     <div className="flex gap-2">
@@ -61,7 +61,7 @@ function DashboardCard({
                             <button
                                 key={index}
                                 onClick={action.onClick}
-                                className="flex items-center gap-1 px-2 py-1 text-xs font-medium text-gray-700 bg-white rounded border border-gray-200 hover:bg-gray-50"
+                                className="flex items-center gap-1 px-2 py-1 text-xs font-medium text-blue-700 bg-white rounded border border-blue-100 hover:bg-blue-50"
                             >
                                 <action.icon className="w-3 h-3" />
                                 {action.label}
@@ -146,33 +146,44 @@ export default function StudentDashboard() {
 
     const stats = [
         { label: 'Upcoming Meetings', value: '3', icon: Calendar, color: 'bg-blue-100 text-blue-800' },
-        { label: 'Total Meetings', value: '24', icon: Clock, color: 'bg-purple-100 text-purple-800' },
-        { label: 'Team Members', value: '6', icon: Users, color: 'bg-green-100 text-green-800' },
-        { label: 'Project Milestone', value: '65%', icon: TrendingUp, color: 'bg-amber-100 text-amber-800' },
+        { label: 'Total Meetings', value: '24', icon: Clock, color: 'bg-blue-200 text-blue-800' },
+        { label: 'Team Members', value: '6', icon: Users, color: 'bg-blue-100 text-blue-800' },
+        { label: 'Project Milestone', value: '65%', icon: TrendingUp, color: 'bg-blue-200 text-blue-800' },
         // Updated Lectures Attended stat
         {
             label: 'Lectures Attended',
             value: `${attendedLectures} / ${totalLectures}`,
             icon: Calendar,
-            color: 'bg-indigo-100 text-indigo-800'
+            color: 'bg-blue-100 text-blue-800'
         },
-        { label: 'Bonus Marks', value: '15', icon: Award, color: 'bg-pink-100 text-pink-800' }
+        { label: 'Bonus Marks', value: '15', icon: Award, color: 'bg-blue-200 text-blue-800' }
     ];
+
+    // Function to format username properly with explicit type annotation
+    const formatDisplayName = (username: string | undefined): string => {
+        if (!username) return '';
+
+        // Split by dot and get the first part
+        const firstPart = username.split('.')[0];
+        // Capitalize the first letter
+        return firstPart.charAt(0).toUpperCase() + firstPart.slice(1);
+    };
 
     return (
         <div className="space-y-8 pb-8">
             {/* Hero section with greeting */}
-            <div className="bg-gradient-to-r from-blue-500 to-indigo-600 rounded-lg p-6 shadow-lg">
+            <div className="bg-gradient-to-r from-blue-500 to-blue-700 rounded-lg p-6 shadow-lg">
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center">
                     <div className="text-white">
                         <h2 className="text-3xl font-bold">
-                            {greeting}, {user?.name ? user.name.charAt(0).toUpperCase() + user.name.slice(1).split('.')[0] : ''}!
+                            {greeting}, {formatDisplayName(user?.name)}!
                         </h2>
                         <p className="mt-2 text-blue-100 max-w-xl">
                             Track your SDGP project progress, collaborate with your team, and receive valuable feedback from mentors.
                         </p>
                     </div>
-                    <div className="mt-4 md:mt-0 bg-white/10 backdrop-blur-sm px-4 py-3 rounded-lg border border-white/20">
+                    {/* Fixed quote container with z-index and positioning to avoid dropdown overlap */}
+                    <div className="mt-4 md:mt-0 bg-white/10 backdrop-blur-sm px-4 py-3 rounded-lg border border-white/20 z-0 relative">
                         <p className="text-white/90 italic">{quote}</p>
                     </div>
                 </div>
@@ -205,7 +216,7 @@ export default function StudentDashboard() {
                         description="Live session on UI/UX principles. Join via Microsoft Teams."
                         footer={`${nextLecture.time} • ${nextLecture.countdown}`}
                         icon={Video}
-                        accentColor="bg-gradient-to-r from-green-500 to-emerald-600"
+                        accentColor="bg-gradient-to-r from-blue-400 to-blue-600"
                         link="https://teams.microsoft.com/l/meetup-join/SDGP-weekly-lecture"
                         actions={[
                             { label: 'Add to Calendar', icon: Calendar }
@@ -219,7 +230,7 @@ export default function StudentDashboard() {
                         description="Presented the project demo, received constructive feedback, and implemented the necessary improvements."
                         footer="2 hours ago"
                         icon={Clock}
-                        accentColor="bg-gradient-to-r from-purple-500 to-purple-700"
+                        accentColor="bg-gradient-to-r from-blue-600 to-blue-800"
                     />
                 </div>
 
@@ -229,7 +240,7 @@ export default function StudentDashboard() {
                         description="Upcoming brainstorming session to finalize the UI design and implement new features based on mentor feedback."
                         footer="Friday at 3:30 PM"
                         icon={Users}
-                        accentColor="bg-gradient-to-r from-amber-500 to-amber-700"
+                        accentColor="bg-gradient-to-r from-blue-500 to-blue-700"
                         actions={[
                             { label: 'Share Ideas', icon: MessageSquare }
                         ]}

@@ -44,7 +44,7 @@ export default function Navigation() {
             user?.role === 'sdgp_admin' ? sdgpAdminLinks : adminLinks;
 
     return (
-        <nav className="hidden md:flex items-center space-x-4">
+        <nav className="hidden md:flex items-center space-x-4 z-0 relative">
             {links.map((link) => {
                 const Icon = link.icon;
                 return (
