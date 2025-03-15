@@ -62,7 +62,8 @@ export default function LoginForm() {
                         access_type: 'offline',
                     },
                     // redirectTo: `${window.location.origin}/loginform`
-                    redirectTo: `${window.location.origin}/dashboard`
+                    redirectTo: `${window.location.origin}`
+                    // redirectTo: `/`
                 }
             });
             console.log('OAuth Sign-In Data:', data);
@@ -73,7 +74,7 @@ export default function LoginForm() {
             if (sessionError) throw sessionError;
 
             const user = await loginGoogleUser(sessionData?.session?.access_token as string, role);
-            console.log('SDGP User:', user);
+            console.log('User:', user);
             login(user);
 
         } catch (err) {

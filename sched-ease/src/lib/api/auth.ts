@@ -42,15 +42,17 @@ export const loginGoogleUser = async (
         throw new Error("Failed to fetch user data");
     }
 
-    console.log(response);
+    const json = await response.json();
+
+    console.log("response: ", json);
 
     return {
-        id: response.Metadata.custom_claims?.sub || 'unknown-id',  // Using 'sub' as unique identifier
-        name: response.Metadata.full_name || 'Unknown User',
-        email: response.Metadata.email || 'unknown-email',
+        id: json.SDGP_Student?.student?.id.toString() || "",
+        name: json.SDGP_Student?.student?.name || "",
+        email: json.SDGP_Student?.student?.email || "",
+        avatar: json.Metadata?.avatar_url || json.Metadata?.picture || "",
         role,
-        avatar: response.Metadata.avatar_url || response.Metadata.picture || '',
-        token: token,  // Use the actual provided token
+        token,
     };
 
     throw new Error('Invalid credentials');

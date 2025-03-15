@@ -33,7 +33,7 @@ export async function getRequest<T>(token: string, target: string, params: Recor
     }
 }
 
-export async function postRequest(token: string, target: string, headers: Record<string, string>): Promise<any> {
+export async function postRequest(token: string, target: string, headers: Record<string, string>): Promise<Response> {
     // const url: string = import.meta.env.VITE_SE_BE_URL as string;
 
     const reqHeaders = new Headers();
@@ -52,8 +52,8 @@ export async function postRequest(token: string, target: string, headers: Record
 
     let fetchStr = `${url}/${target}`;
 
-    console.log(fetchStr);
-    console.log(requestOptions);
+    // console.log(fetchStr);
+    // console.log(requestOptions);
 
     try {
         const response = await fetch(fetchStr, requestOptions);
@@ -61,8 +61,9 @@ export async function postRequest(token: string, target: string, headers: Record
         if (!response.ok) {
             throw new Error(`HTTP error! Status: ${response.status}`);
         }
-        const result = await response.json();
-        return result;
+        // const result = await response.json();
+        // return result;
+        return response;
     } catch (error) {
         console.error(error);
         throw error;
