@@ -1,5 +1,6 @@
 import React from 'react';
 import { cn } from '../../lib/utils';
+import '../../css/Input.css';
 
 interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
     label?: string;
@@ -14,24 +15,23 @@ export default function Input({
                                   ...props
                               }: InputProps) {
     return (
-        <div className="space-y-1">
+        <div className="input-container">
             {label && (
-                <label htmlFor={id} className="block text-sm font-medium text-gray-700">
+                <label htmlFor={id} className="input-label">
                     {label}
                 </label>
             )}
             <input
                 id={id}
                 className={cn(
-                    'block w-full rounded-md border-gray-300 shadow-sm',
-                    'focus:border-blue-500 focus:ring-blue-500',
-                    error && 'border-red-300',
+                    'input-field',
+                    error && 'error',
                     className
                 )}
                 {...props}
             />
             {error && (
-                <p className="text-sm text-red-600">{error}</p>
+                <p className="input-error-message">{error}</p>
             )}
         </div>
     );
