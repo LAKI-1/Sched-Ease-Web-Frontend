@@ -1,5 +1,21 @@
-import React, { useState } from 'react';
-import { Calendar as CalendarIcon, Users, MessageSquare, MapPin, PlusCircle, Trash2 } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Calendar as CalendarIcon, Users, MessageSquare, MapPin, PlusCircle, Trash2, Save, Loader } from 'lucide-react';
+import axios from 'axios';
+import '../../css/Timetable.css';
+
+const API_BASE_URL = 'http://localhost:8080/api';
+
+interface SessionDTO {
+    lecturerIds: Set<number>;
+    hallId: number;
+    level: string;
+    course: string;
+    dayOfWeek: string;
+    startTime: string;
+    endTime: string;
+    lectureOrTutorial: string;
+    timeTableId: number;
+}
 
 interface GroupSession {
     id: string;
@@ -12,43 +28,172 @@ interface GroupSession {
     type: 'Lecture' | 'Tutorial';
     building: string;
     classroom: string;
+    lecturerId?: number;
+    hallId?: number;
+    timeTableId?: number;
 }
 
 export function Timetable() {
+    // API functions
+    const api = {
+        async saveSessions(groupId: number, sessions: SessionDTO[]): Promise<string> {
+            try {
+                const response = await axios.post(
+                    `${API_BASE_URL}/sessions/add-to-group/${groupId}`,
+                    sessions
+                );
+                return response.data;
+            } catch (error) {
+                if (axios.isAxiosError(error) && error.response) {
+                    throw new Error(error.response.data);
+                }
+                throw new Error('Failed to save sessions');
+            }
+        },
+
+        async getHalls(): Promise<any[]> {
+            try {
+                const response = await axios.get(`${API_BASE_URL}/sessions/halls`);
+                return response.data;
+            } catch (error) {
+                throw new Error('Failed to fetch halls');
+            }
+        },
+
+        async getLecturers(): Promise<any[]> {
+            try {
+                const response = await axios.get(`${API_BASE_URL}/sessions/lecturers`);
+                return response.data;
+            } catch (error) {
+                throw new Error('Failed to fetch lecturers');
+            }
+        }
+    };
+
     const [selectedGroup, setSelectedGroup] = useState<string>('CS-G1');
     const [sessions, setSessions] = useState<GroupSession[]>([]);
+    const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
+    const [halls, setHalls] = useState<any[]>([]);
+    const [lecturers, setLecturers] = useState<any[]>([]);
+    const [isLoading, setIsLoading] = useState({
+        halls: true,
+        lecturers: true
+    });
+    const [loadError, setLoadError] = useState({
+        halls: '',
+        lecturers: ''
+    });
     const [newSession, setNewSession] = useState<GroupSession>({
         id: '',
         group: selectedGroup,
         lecturer: '',
         module: '',
         date: 'Monday',
-        startTime: '',
-        endTime: '',
+        startTime: '09:00',
+        endTime: '10:30',
         type: 'Lecture',
         building: '',
-        classroom: ''
+        classroom: '',
+        lecturerId: undefined,
+        hallId: undefined,
+        timeTableId: 1 // You might want to make this dynamic based on your needs
     });
+
+    // Updated fetch halls and lecturers with loading states
+    useEffect(() => {
+        const fetchData = async () => {
+            // Reset errors
+            setLoadError({ halls: '', lecturers: '' });
+
+            // Fetch halls
+            try {
+                const hallsData = await api.getHalls();
+                setHalls(hallsData);
+            } catch (error) {
+                setLoadError(prev => ({
+                    ...prev,
+                    halls: 'Failed to load buildings. Please try again.'
+                }));
+            } finally {
+                setIsLoading(prev => ({ ...prev, halls: false }));
+            }
+
+            // Fetch lecturers
+            try {
+                const lecturersData = await api.getLecturers();
+                setLecturers(lecturersData);
+            } catch (error) {
+                setLoadError(prev => ({
+                    ...prev,
+                    lecturers: 'Failed to load lecturers. Please try again.'
+                }));
+            } finally {
+                setIsLoading(prev => ({ ...prev, lecturers: false }));
+            }
+        };
+
+        fetchData();
+    }, []);
+
+    // Load saved sessions when component mounts or group changes
+    useEffect(() => {
+        const savedSessions = localStorage.getItem(`sessions_${selectedGroup}`);
+        if (savedSessions) {
+            setSessions(JSON.parse(savedSessions));
+        } else {
+            setSessions([]); // Start with empty array if no saved sessions
+        }
+    }, [selectedGroup]);
 
     const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
     const times = Array.from({ length: 9 }, (_, i) => `${String(i + 9).padStart(2, '0')}:00`);
+    const endTimes = Array.from({ length: 18 }, (_, i) => {
+        const hour = Math.floor(i / 2) + 9;
+        const minute = i % 2 === 0 ? '00' : '30';
+        return `${String(hour).padStart(2, '0')}:${minute}`;
+    });
 
     const filteredSessions = sessions.filter(session => session.group === selectedGroup);
 
     const handleAddSession = () => {
         if (newSession.lecturer && newSession.building && newSession.classroom) {
-            setSessions([...sessions, { ...newSession, id: (sessions.length + 1).toString(), group: selectedGroup }]);
+            // Validate that end time is after start time
+            if (newSession.endTime <= newSession.startTime) {
+                alert('End time must be after start time');
+                return;
+            }
+
+            // Find the corresponding hall and lecturer IDs
+            const hall = halls.find(h => h.name === newSession.building);
+            const lecturer = lecturers.find(l => l.name === newSession.lecturer);
+
+            if (!hall || !lecturer) {
+                alert('Invalid hall or lecturer selected');
+                return;
+            }
+
+            setSessions([...sessions, {
+                ...newSession,
+                id: (sessions.length + 1).toString(),
+                group: selectedGroup,
+                hallId: hall.id,
+                lecturerId: lecturer.id
+            }]);
+
             setNewSession({
                 id: '',
                 group: selectedGroup,
                 lecturer: '',
                 module: '',
                 date: 'Monday',
-                startTime: '',
-                endTime: '',
+                startTime: '09:00',
+                endTime: '10:30',
                 type: 'Lecture',
                 building: '',
-                classroom: ''
+                classroom: '',
+                lecturerId: undefined,
+                hallId: undefined,
+                timeTableId: 1
             });
         } else {
             alert('Please fill out all fields to add a session.');
@@ -59,23 +204,65 @@ export function Timetable() {
         setSessions(sessions.filter(session => session.id !== id));
     };
 
+    const handleSaveSessions = async () => {
+        try {
+            setSaveStatus('saving');
+
+            // Convert sessions to backend DTO format
+            const sessionsToSave: SessionDTO[] = sessions.map(session => ({
+                lecturerIds: new Set([session.lecturerId!]),
+                hallId: session.hallId!,
+                level: '1', // You might want to make this dynamic
+                course: session.module,
+                dayOfWeek: session.date,
+                startTime: session.startTime,
+                endTime: session.endTime,
+                lectureOrTutorial: session.type,
+                timeTableId: session.timeTableId!
+            }));
+
+            // Extract group number from group string (e.g., "CS-G1" -> 1)
+            const groupNumber = parseInt(selectedGroup.split('-G')[1]);
+
+            await api.saveSessions(groupNumber, sessionsToSave);
+
+            setSaveStatus('saved');
+            setTimeout(() => setSaveStatus('idle'), 3000);
+        } catch (error) {
+            setSaveStatus('error');
+            setTimeout(() => setSaveStatus('idle'), 3000);
+            console.error('Error saving sessions:', error);
+        }
+    };
+
     return (
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            <div className="flex items-center gap-3 mb-8">
-                <CalendarIcon size={32} className="text-indigo-600" />
-                <h2 className="text-2xl font-semibold text-gray-900">Group Timetable</h2>
+        <div className="timetable-container">
+            <div className="header-container">
+                <CalendarIcon size={32} className="header-icon" />
+                <h2 className="header-title">Group Timetable</h2>
+                <button
+                    onClick={handleSaveSessions}
+                    className={`save-button ${saveStatus !== 'idle' ? 'save-button-' + saveStatus : ''}`}
+                    disabled={saveStatus === 'saving'}
+                >
+                    <Save size={16} className="save-button-icon" />
+                    {saveStatus === 'idle' && 'Save Sessions'}
+                    {saveStatus === 'saving' && 'Saving...'}
+                    {saveStatus === 'saved' && 'Saved!'}
+                    {saveStatus === 'error' && 'Error Saving'}
+                </button>
             </div>
 
             {/* Group Selector */}
-            <div className="mb-6">
-                <label htmlFor="group-select" className="block text-sm font-medium text-gray-700 mb-2">
+            <div className="group-selector">
+                <label htmlFor="group-select" className="group-label">
                     Select Group
                 </label>
                 <select
                     id="group-select"
                     value={selectedGroup}
                     onChange={(e) => setSelectedGroup(e.target.value)}
-                    className="block w-full max-w-xs rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                    className="group-select"
                 >
                     {[
                         ...Array.from({ length: 40 }, (_, i) => `CS-G${i + 1}`),
@@ -87,137 +274,199 @@ export function Timetable() {
             </div>
 
             {/* Add Session Form */}
-            <div className="mb-6 bg-gray-100 p-4 rounded-lg">
-                <h3 className="text-lg font-semibold mb-4">Add New Session</h3>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700">Lecturer</label>
+            <div className="add-session-form">
+                <h3 className="form-title">Add New Session</h3>
+                <div className="form-grid">
+                    <div className="form-group">
+                        <label className="form-label">Lecturer</label>
+                        <div className="select-wrapper">
+                            <select
+                                value={newSession.lecturer}
+                                onChange={(e) => {
+                                    const lecturer = lecturers.find(l => l.name === e.target.value);
+                                    setNewSession({
+                                        ...newSession,
+                                        lecturer: e.target.value,
+                                        lecturerId: lecturer?.id
+                                    });
+                                }}
+                                className="form-select"
+                                disabled={isLoading.lecturers}
+                            >
+                                <option value="">Select Lecturer</option>
+                                {lecturers.map(lecturer => (
+                                    <option key={lecturer.id} value={lecturer.name}>
+                                        {lecturer.name}
+                                    </option>
+                                ))}
+                            </select>
+                            {isLoading.lecturers && (
+                                <div className="select-loading">
+                                    <Loader size={16} className="loading-spinner" />
+                                </div>
+                            )}
+                        </div>
+                        {loadError.lecturers && (
+                            <div className="error-message">{loadError.lecturers}</div>
+                        )}
+                    </div>
+                    <div className="form-group">
+                        <label className="form-label">Module</label>
                         <input
                             type="text"
-                            value={newSession.lecturer}
-                            onChange={(e) => setNewSession({ ...newSession, lecturer: e.target.value })}
-                            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                            value={newSession.module}
+                            onChange={(e) => setNewSession({ ...newSession, module: e.target.value })}
+                            className="form-input"
+                            placeholder="e.g., CS101"
                         />
                     </div>
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700">Date</label>
+                    <div className="form-group">
+                        <label className="form-label">Date</label>
                         <select
                             value={newSession.date}
                             onChange={(e) => setNewSession({ ...newSession, date: e.target.value })}
-                            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                            className="form-select"
                         >
                             {days.map(day => (
                                 <option key={day} value={day}>{day}</option>
                             ))}
                         </select>
                     </div>
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700">Start Time</label>
+                    <div className="form-group">
+                        <label className="form-label">Start Time</label>
                         <select
                             value={newSession.startTime}
                             onChange={(e) => setNewSession({ ...newSession, startTime: e.target.value })}
-                            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                            className="form-select"
                         >
-                            {times.map(time => (
+                            {endTimes.slice(0, -1).map(time => (
                                 <option key={time} value={time}>{time}</option>
                             ))}
                         </select>
                     </div>
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700">End Time</label>
+                    <div className="form-group">
+                        <label className="form-label">End Time</label>
                         <select
                             value={newSession.endTime}
                             onChange={(e) => setNewSession({ ...newSession, endTime: e.target.value })}
-                            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                            className="form-select"
                         >
-                            {times.map(time => (
+                            {endTimes.slice(1).map(time => (
                                 <option key={time} value={time}>{time}</option>
                             ))}
                         </select>
                     </div>
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700">Type</label>
+                    <div className="form-group">
+                        <label className="form-label">Type</label>
                         <select
                             value={newSession.type}
                             onChange={(e) => setNewSession({ ...newSession, type: e.target.value as 'Lecture' | 'Tutorial' })}
-                            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                            className="form-select"
                         >
                             <option value="Lecture">Lecture</option>
                             <option value="Tutorial">Tutorial</option>
                         </select>
                     </div>
-
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700">Building</label>
-                        <input
-                            type="text"
-                            value={newSession.building}
-                            onChange={(e) => setNewSession({ ...newSession, building: e.target.value })}
-                            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                        />
+                    <div className="form-group">
+                        <label className="form-label">Building</label>
+                        <div className="select-wrapper">
+                            <select
+                                value={newSession.building}
+                                onChange={(e) => {
+                                    const hall = halls.find(h => h.name === e.target.value);
+                                    setNewSession({
+                                        ...newSession,
+                                        building: hall?.building || '',
+                                        classroom: hall?.name || '',
+                                        hallId: hall?.id
+                                    });
+                                }}
+                                className="form-select"
+                                disabled={isLoading.halls}
+                            >
+                                <option value="">Select Building</option>
+                                {halls.map(hall => (
+                                    <option key={hall.id} value={hall.name}>
+                                        {hall.building} - {hall.name}
+                                    </option>
+                                ))}
+                            </select>
+                            {isLoading.halls && (
+                                <div className="select-loading">
+                                    <Loader size={16} className="loading-spinner" />
+                                </div>
+                            )}
+                        </div>
+                        {loadError.halls && (
+                            <div className="error-message">{loadError.halls}</div>
+                        )}
                     </div>
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700">Classroom</label>
+                    <div className="form-group">
+                        <label className="form-label">Classroom</label>
                         <input
                             type="text"
                             value={newSession.classroom}
-                            onChange={(e) => setNewSession({ ...newSession, classroom: e.target.value })}
-                            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                            className="form-input"
+                            disabled
+                            placeholder="Automatically set from building selection"
                         />
                     </div>
                 </div>
                 <button
                     onClick={handleAddSession}
-                    className="mt-4 bg-indigo-600 text-white px-4 py-2 rounded-lg shadow hover:bg-indigo-700"
+                    className="add-button"
+                    disabled={isLoading.halls || isLoading.lecturers}
                 >
-                    <PlusCircle size={16} className="inline-block mr-2" /> Add Session
+                    <PlusCircle size={16} className="add-button-icon" /> Add Session
                 </button>
             </div>
 
             {/* Timetable */}
-            <div className="bg-white shadow rounded-lg p-6 overflow-x-auto">
-                <div className="min-w-[1000px]">
-                    <div className="grid grid-cols-[120px_repeat(5,1fr)] gap-2">
-                        <div className="font-semibold text-gray-500">Time</div>
+            <div className="timetable">
+                <div className="timetable-inner">
+                    <div className="timetable-grid">
+                        <div className="grid-header">Time</div>
                         {days.map(day => (
-                            <div key={day} className="font-semibold text-center text-gray-500">{day}</div>
+                            <div key={day} className="grid-header-center">{day}</div>
                         ))}
                         {times.map(time => (
                             <React.Fragment key={time}>
-                                <div className="py-3 font-medium text-gray-600">{time}</div>
+                                <div className="time-slot">{time}</div>
                                 {days.map(day => {
-                                    const session = filteredSessions.find(s => s.startTime === time && s.date === day);
+                                    const session = filteredSessions.find(s =>
+                                        s.date === day &&
+                                        s.startTime <= time &&
+                                        time < s.endTime
+                                    );
                                     return (
                                         <div
                                             key={`${time}-${day}`}
-                                            className={`p-2 border rounded-lg ${
-                                                session ? 'bg-indigo-50 border-indigo-200' : 'border-gray-200'
-                                            }`}
+                                            className={`session-cell ${session ? 'has-session' : ''}`}
                                         >
-                                            {session && (
-                                                <div className="text-sm">
-                                                    <div className="flex items-center justify-between mb-1">
-                                                        <span className="font-medium text-indigo-600">{session.group}</span>
+                                            {session && time === session.startTime && (
+                                                <div className="session-content">
+                                                    <div className="session-header">
+                                                        <span className="session-group">{session.group}</span>
                                                         <button
                                                             onClick={() => removeSession(session.id)}
-                                                            className="text-red-500 hover:text-red-700"
+                                                            className="delete-button"
                                                         >
                                                             <Trash2 size={14} />
                                                         </button>
                                                     </div>
-                                                    <div className="flex items-center gap-1 text-gray-600">
+                                                    <div className="session-info">
                                                         <Users size={14} />
-                                                        <span className="truncate">{session.lecturer}</span>
+                                                        <span className="session-info-text">{session.lecturer}</span>
                                                     </div>
-                                                    <div className="flex items-center gap-1 text-gray-600">
+                                                    <div className="session-info">
                                                         <MessageSquare size={14} />
-                                                        <span className="truncate">{session.type}</span>
+                                                        <span className="session-info-text">{session.type}</span>
                                                     </div>
-                                                    <div className="flex items-center gap-1 text-gray-600">
+                                                    <div className="session-info">
                                                         <MapPin size={14} />
-                                                        <span className="truncate">{session.building}, {session.classroom}</span>
+                                                        <span className="session-info-text">{session.building}, {session.classroom}</span>
                                                     </div>
-                                                    <div className="text-xs text-gray-500 mt-1">
+                                                    <div className="session-time">
                                                         {session.startTime} - {session.endTime}
                                                     </div>
                                                 </div>

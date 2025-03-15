@@ -1,6 +1,7 @@
 import { useState, ChangeEvent, FormEvent } from 'react';
 import { useAuthStore } from '../../lib/store/authStore';
 import { Bell, Save, Moon, Sun, User, Globe } from 'lucide-react';
+import '../../css/SettingsPage.css';
 
 type FormData = {
     name: string;
@@ -51,65 +52,59 @@ export default function SettingsPage() {
     ];
 
     return (
-        <div className={`min-h-screen transition-colors duration-300 ${darkMode ? 'bg-gray-900 text-white' : 'bg-gray-50 text-gray-900'}`}>
-            <div className="max-w-5xl mx-auto p-6 space-y-8">
+        <div className={`settings-container ${darkMode ? 'dark' : 'light'}`}>
+            <div className="settings-content">
                 {/* Header with theme toggle */}
-                <div className="flex justify-between items-center border-b pb-5">
-                    <div>
-                        <h1 className="text-3xl font-bold">Your Settings</h1>
-                        <p className={`mt-2 text-sm ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                <div className="settings-header">
+                    <div className="header-text">
+                        <h1>Your Settings</h1>
+                        <p className={darkMode ? 'dark' : 'light'}>
                             Customize your experience and make it uniquely yours
                         </p>
                     </div>
                     <button
                         onClick={() => setDarkMode(!darkMode)}
-                        className={`p-2 rounded-full ${darkMode ? 'bg-gray-800 text-yellow-300' : 'bg-gray-200 text-gray-700'}`}
+                        className={`theme-toggle ${darkMode ? 'dark' : 'light'}`}
                     >
                         {darkMode ? <Sun size={24} /> : <Moon size={24} />}
                     </button>
                 </div>
 
                 {/* Tab Navigation */}
-                <div className="flex overflow-x-auto space-x-2 pb-2">
+                <div className="tab-navigation">
                     {tabs.map((tab) => (
                         <button
                             key={tab.id}
                             onClick={() => setActiveTab(tab.id)}
-                            className={`flex items-center px-4 py-2 rounded-lg transition-all ${
-                                activeTab === tab.id
-                                    ? (darkMode ? 'bg-blue-600 text-white' : 'bg-blue-500 text-white')
-                                    : (darkMode ? 'bg-gray-800 text-gray-300 hover:bg-gray-700' : 'bg-white text-gray-700 hover:bg-gray-100')
-                            }`}
+                            className={`tab-button ${activeTab === tab.id ? 'active' : 'inactive'} ${darkMode ? 'dark' : 'light'}`}
                         >
-                            <span className="mr-2">{tab.icon}</span>
+                            <span className="icon">{tab.icon}</span>
                             {tab.label}
                         </button>
                     ))}
                 </div>
 
                 {/* Main Content */}
-                <div className={`rounded-xl shadow-lg overflow-hidden ${darkMode ? 'bg-gray-800' : 'bg-white'}`}>
+                <div className={`content-area ${darkMode ? 'dark' : 'light'}`}>
                     <form onSubmit={handleSubmit}>
                         {/* Profile Tab */}
                         {activeTab === 'profile' && (
-                            <div className="p-6 space-y-6">
-                                <div className="flex items-center space-x-6">
-                                    <div className="relative">
-                                        <div className={`h-24 w-24 rounded-full flex items-center justify-center text-2xl font-bold ${darkMode ? 'bg-gray-700' : 'bg-blue-100'}`}>
-                                            {formData.name.charAt(0).toUpperCase()}
-                                        </div>
+                            <div className="profile-section">
+                                <div className="profile-header">
+                                    <div className={`avatar ${darkMode ? 'dark' : 'light'}`}>
+                                        {formData.name.charAt(0).toUpperCase()}
                                     </div>
-                                    <div>
-                                        <h3 className="text-xl font-semibold">Your Profile</h3>
-                                        <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                                    <div className="profile-info">
+                                        <h3>Your Profile</h3>
+                                        <p className={darkMode ? 'dark' : 'light'}>
                                             How others will see you across the platform
                                         </p>
                                     </div>
                                 </div>
 
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    <div>
-                                        <label className={`block text-sm font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                                <div className="form-grid">
+                                    <div className="form-field">
+                                        <label className={darkMode ? 'dark' : 'light'}>
                                             Display Name
                                         </label>
                                         <input
@@ -117,13 +112,11 @@ export default function SettingsPage() {
                                             name="name"
                                             value={formData.name}
                                             onChange={handleChange}
-                                            className={`mt-1 block w-full rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 ${
-                                                darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'border-gray-300'
-                                            }`}
+                                            className={`form-input ${darkMode ? 'dark' : 'light'}`}
                                         />
                                     </div>
-                                    <div>
-                                        <label className={`block text-sm font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                                    <div className="form-field">
+                                        <label className={darkMode ? 'dark' : 'light'}>
                                             Email Address
                                         </label>
                                         <input
@@ -131,22 +124,18 @@ export default function SettingsPage() {
                                             name="email"
                                             value={formData.email}
                                             onChange={handleChange}
-                                            className={`mt-1 block w-full rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 ${
-                                                darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'border-gray-300'
-                                            }`}
+                                            className={`form-input ${darkMode ? 'dark' : 'light'}`}
                                         />
                                     </div>
-                                    <div>
-                                        <label className={`block text-sm font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                                    <div className="form-field">
+                                        <label className={darkMode ? 'dark' : 'light'}>
                                             Preferred Language
                                         </label>
                                         <select
                                             name="language"
                                             value={formData.language}
                                             onChange={handleChange}
-                                            className={`mt-1 block w-full rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 ${
-                                                darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'border-gray-300'
-                                            }`}
+                                            className={`form-input ${darkMode ? 'dark' : 'light'}`}
                                         >
                                             <option>English</option>
                                             <option>Spanish</option>
@@ -155,17 +144,15 @@ export default function SettingsPage() {
                                             <option>Japanese</option>
                                         </select>
                                     </div>
-                                    <div>
-                                        <label className={`block text-sm font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                                    <div className="form-field">
+                                        <label className={darkMode ? 'dark' : 'light'}>
                                             Timezone
                                         </label>
                                         <select
                                             name="timezone"
                                             value={formData.timezone}
                                             onChange={handleChange}
-                                            className={`mt-1 block w-full rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 ${
-                                                darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'border-gray-300'
-                                            }`}
+                                            className={`form-input ${darkMode ? 'dark' : 'light'}`}
                                         >
                                             <option>UTC-8 (Pacific Time)</option>
                                             <option>UTC-7 (Mountain Time)</option>
@@ -181,78 +168,66 @@ export default function SettingsPage() {
 
                         {/* Notifications Tab */}
                         {activeTab === 'notifications' && (
-                            <div className="p-6 space-y-6">
-                                <div>
-                                    <h3 className="text-xl font-semibold">Notification Preferences</h3>
-                                    <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                            <div className="notification-section">
+                                <div className="notification-header">
+                                    <h3>Notification Preferences</h3>
+                                    <p className={darkMode ? 'dark' : 'light'}>
                                         Control how and when we reach out to you
                                     </p>
                                 </div>
 
-                                <div className="space-y-4">
-                                    <div className={`p-4 rounded-lg ${darkMode ? 'bg-gray-700' : 'bg-gray-50'}`}>
-                                        <div className="flex items-start">
-                                            <div className="flex items-center h-5">
-                                                <input
-                                                    id="email_notifications"
-                                                    name="emailNotifications"
-                                                    type="checkbox"
-                                                    checked={formData.emailNotifications}
-                                                    onChange={handleChange}
-                                                    className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                                                />
-                                            </div>
-                                            <div className="ml-3">
-                                                <label htmlFor="email_notifications" className="text-base font-medium">
-                                                    Email Notifications
-                                                </label>
-                                                <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                                <div className="notification-options">
+                                    <div className={`notification-option ${darkMode ? 'dark' : 'light'}`}>
+                                        <div className="checkbox-wrapper">
+                                            <input
+                                                id="email_notifications"
+                                                name="emailNotifications"
+                                                type="checkbox"
+                                                checked={formData.emailNotifications}
+                                                onChange={handleChange}
+                                                className="checkbox-input"
+                                            />
+                                            <div className="checkbox-label">
+                                                <h4>Email Notifications</h4>
+                                                <p className={darkMode ? 'dark' : 'light'}>
                                                     Receive timely updates about activity relevant to you
                                                 </p>
                                             </div>
                                         </div>
                                     </div>
 
-                                    <div className={`p-4 rounded-lg ${darkMode ? 'bg-gray-700' : 'bg-gray-50'}`}>
-                                        <div className="flex items-start">
-                                            <div className="flex items-center h-5">
-                                                <input
-                                                    id="push_notifications"
-                                                    name="pushNotifications"
-                                                    type="checkbox"
-                                                    checked={formData.pushNotifications}
-                                                    onChange={handleChange}
-                                                    className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                                                />
-                                            </div>
-                                            <div className="ml-3">
-                                                <label htmlFor="push_notifications" className="text-base font-medium">
-                                                    Push Notifications
-                                                </label>
-                                                <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                                    <div className={`notification-option ${darkMode ? 'dark' : 'light'}`}>
+                                        <div className="checkbox-wrapper">
+                                            <input
+                                                id="push_notifications"
+                                                name="pushNotifications"
+                                                type="checkbox"
+                                                checked={formData.pushNotifications}
+                                                onChange={handleChange}
+                                                className="checkbox-input"
+                                            />
+                                            <div className="checkbox-label">
+                                                <h4>Push Notifications</h4>
+                                                <p className={darkMode ? 'dark' : 'light'}>
                                                     Get real-time alerts directly to your device
                                                 </p>
                                             </div>
                                         </div>
                                     </div>
 
-                                    <div className={`p-4 rounded-lg ${darkMode ? 'bg-gray-700' : 'bg-gray-50'}`}>
-                                        <div className="flex items-start">
-                                            <div className="flex items-center h-5">
-                                                <input
-                                                    id="weekly_digest"
-                                                    name="weeklyDigest"
-                                                    type="checkbox"
-                                                    checked={formData.weeklyDigest}
-                                                    onChange={handleChange}
-                                                    className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                                                />
-                                            </div>
-                                            <div className="ml-3">
-                                                <label htmlFor="weekly_digest" className="text-base font-medium">
-                                                    Weekly Digest
-                                                </label>
-                                                <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                                    <div className={`notification-option ${darkMode ? 'dark' : 'light'}`}>
+                                        <div className="checkbox-wrapper">
+                                            <input
+                                                id="weekly_digest"
+                                                name="weeklyDigest"
+                                                type="checkbox"
+                                                checked={formData.weeklyDigest}
+                                                onChange={handleChange}
+                                                className="checkbox-input"
+                                            />
+                                            <div className="checkbox-label">
+                                                <h4>Weekly Digest</h4>
+                                                <p className={darkMode ? 'dark' : 'light'}>
                                                     Get a summary of important updates once a week
                                                 </p>
                                             </div>
@@ -264,38 +239,36 @@ export default function SettingsPage() {
 
                         {/* Preferences Tab */}
                         {activeTab === 'preferences' && (
-                            <div className="p-6 space-y-6">
+                            <div className="preferences-section">
                                 <div>
-                                    <h3 className="text-xl font-semibold">Your Preferences</h3>
-                                    <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                                    <h3>Your Preferences</h3>
+                                    <p className={darkMode ? 'dark' : 'light'}>
                                         Customize how you experience our platform
                                     </p>
                                 </div>
 
-                                <div className="space-y-4">
-                                    <label className={`block text-sm font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                                <div>
+                                    <label className={`form-field ${darkMode ? 'dark' : 'light'}`}>
                                         Color Theme
                                     </label>
-                                    <div className="grid grid-cols-5 gap-4">
+                                    <div className="color-options">
                                         {['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6'].map((color) => (
                                             <button
                                                 key={color}
                                                 type="button"
                                                 style={{ backgroundColor: color }}
-                                                className="h-10 rounded-lg shadow-md hover:ring-2 hover:ring-offset-2 hover:ring-gray-400"
+                                                className="color-button"
                                             />
                                         ))}
                                     </div>
                                 </div>
 
-                                <div className="space-y-2">
-                                    <label className={`block text-sm font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                                <div>
+                                    <label className={`form-field ${darkMode ? 'dark' : 'light'}`}>
                                         Default Page
                                     </label>
                                     <select
-                                        className={`block w-full rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 ${
-                                            darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'border-gray-300'
-                                        }`}
+                                        className={`form-input ${darkMode ? 'dark' : 'light'}`}
                                     >
                                         <option>Dashboard</option>
                                         <option>Analytics</option>
@@ -307,18 +280,18 @@ export default function SettingsPage() {
                         )}
 
                         {/* Footer with save button */}
-                        <div className={`px-6 py-4 ${darkMode ? 'bg-gray-900' : 'bg-gray-50'} flex justify-between items-center`}>
+                        <div className={`settings-footer ${darkMode ? 'dark' : 'light'}`}>
                             <button
                                 type="button"
-                                className={`text-sm ${darkMode ? 'text-gray-400 hover:text-gray-300' : 'text-gray-600 hover:text-gray-900'}`}
+                                className={`reset-button ${darkMode ? 'dark' : 'light'}`}
                             >
                                 Reset to defaults
                             </button>
                             <button
                                 type="submit"
-                                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                                className="save-button"
                             >
-                                <Save size={18} className="mr-2" />
+                                <Save size={18} className="icon" />
                                 Save Changes
                             </button>
                         </div>
