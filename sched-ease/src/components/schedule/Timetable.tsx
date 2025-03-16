@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Calendar as CalendarIcon, Users, MessageSquare, MapPin, PlusCircle, Trash2, Save, Loader } from 'lucide-react';
+import { Users, MessageSquare, MapPin, PlusCircle, Trash2, Save, Loader } from 'lucide-react';
 import axios from 'axios';
 import '../../css/Timetable.css';
 
@@ -238,7 +238,6 @@ export function Timetable() {
     return (
         <div className="timetable-container">
             <div className="header-container">
-                <CalendarIcon size={32} className="header-icon" />
                 <h2 className="header-title">Group Timetable</h2>
                 <button
                     onClick={handleSaveSessions}
