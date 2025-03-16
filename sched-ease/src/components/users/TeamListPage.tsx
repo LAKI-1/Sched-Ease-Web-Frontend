@@ -1,5 +1,6 @@
 import React from 'react';
 import { Users, Mail, GraduationCap, CheckCircle, XCircle } from 'lucide-react';
+import '../../css/TeamListPage.css';
 
 interface TeamMember {
     name: string;
@@ -120,43 +121,43 @@ export default function TeamListPage() {
         if (!team) return null;
 
         return (
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                <div className="mb-8">
+            <div className="team-container">
+                <div>
                     <button
                         onClick={() => setSelectedTeam(null)}
-                        className="text-indigo-600 hover:text-indigo-800 flex items-center gap-2"
+                        className="back-button"
                     >
                         ← Back to Teams
                     </button>
                 </div>
 
-                <div className="bg-white shadow rounded-lg">
-                    <div className="p-6">
-                        <div className="flex justify-between items-start mb-6">
+                <div className="team-detail-card">
+                    <div className="team-detail-content">
+                        <div className="team-header">
                             <div>
-                                <h2 className="text-2xl font-semibold text-gray-900">{team.teamId}</h2>
-                                <div className="mt-2 space-y-1">
-                                    <p className="text-gray-600">Registration Date: {team.registrationDate}</p>
-                                    <p className="flex items-center gap-2">
+                                <h2 className="team-id">{team.teamId}</h2>
+                                <div className="team-info">
+                                    <p className="team-date">Registration Date: {team.registrationDate}</p>
+                                    <p className="team-status">
                                         Status:
-                                        <span className={`px-2 py-1 rounded-full text-sm ${team.status === 'approved' ? 'bg-green-100 text-green-800' : team.status === 'rejected' ? 'bg-red-100 text-red-800' : 'bg-yellow-100 text-yellow-800'}`}>
+                                        <span className={`status-badge ${team.status}`}>
                                             {team.status.charAt(0).toUpperCase() + team.status.slice(1)}
                                         </span>
                                     </p>
                                 </div>
                             </div>
                             {team.status === 'pending' && (
-                                <div className="flex gap-2">
+                                <div className="action-buttons">
                                     <button
                                         onClick={() => handleApprove(team.id)}
-                                        className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
+                                        className="approve-button"
                                     >
                                         <CheckCircle size={20} />
                                         Approve
                                     </button>
                                     <button
                                         onClick={() => handleReject(team.id)}
-                                        className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+                                        className="reject-button"
                                     >
                                         <XCircle size={20} />
                                         Reject
@@ -165,39 +166,38 @@ export default function TeamListPage() {
                             )}
                         </div>
 
-                        {/* Display action message */}
                         {actionMessage && (
-                            <div className="mt-4 text-center text-lg font-semibold text-green-600">
+                            <div className="action-message">
                                 {actionMessage}
                             </div>
                         )}
 
-                        <div className="border-t pt-6">
-                            <h3 className="text-lg font-semibold mb-4">Team Members</h3>
-                            <div className="grid gap-4">
+                        <div className="members-section">
+                            <h3 className="members-title">Team Members</h3>
+                            <div className="members-grid">
                                 {team.members.map((member, index) => (
-                                    <div key={index} className="bg-gray-50 p-4 rounded-lg">
-                                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                                            <div className="space-y-1">
-                                                <p className="font-medium flex items-center gap-2">
+                                    <div key={index} className="member-card">
+                                        <div className="member-content">
+                                            <div className="member-info">
+                                                <p className="member-name">
                                                     {member.name}
                                                     {member.isLeader && (
-                                                        <span className="text-xs bg-indigo-100 text-indigo-800 px-2 py-1 rounded">
+                                                        <span className="leader-badge">
                                                             Team Leader
                                                         </span>
                                                     )}
                                                 </p>
-                                                <p className="text-gray-600 text-sm flex items-center gap-2">
+                                                <p className="member-detail">
                                                     <GraduationCap size={16} />
                                                     ID: {member.studentId}
                                                 </p>
-                                                <p className="text-gray-600 text-sm flex items-center gap-2">
+                                                <p className="member-detail">
                                                     <Mail size={16} />
                                                     {member.email}
                                                 </p>
                                             </div>
-                                            <div className="text-right">
-                                                <span className="bg-gray-100 px-3 py-1 rounded-full text-gray-700">
+                                            <div>
+                                                <span className="tutorial-group">
                                                     {member.tutorialGroup}
                                                 </span>
                                             </div>
@@ -213,32 +213,32 @@ export default function TeamListPage() {
     }
 
     return (
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            <div className="flex items-center gap-3 mb-8">
-                <h2 className="text-2xl font-semibold text-gray-900">Registered Teams</h2>
+        <div className="team-container">
+            <div className="header-container">
+                <h2 className="header-title">Registered Teams</h2>
             </div>
 
-            <div className="grid gap-6">
+            <div className="teams-grid">
                 {teams.map((team) => (
-                    <div key={team.id} className="bg-white shadow rounded-lg p-6">
-                        <div className="flex flex-col sm:flex-row justify-between gap-4">
-                            <div className="flex items-start gap-4">
-                                <Users className="w-8 h-8 text-indigo-600" />
-                                <div>
-                                    <h3 className="text-lg font-semibold">{team.teamId}</h3>
-                                    <div className="space-y-1 mt-1">
-                                        <p className="text-gray-600">{team.members.length} members</p>
-                                        <p className="text-gray-600">Registered: {team.registrationDate}</p>
+                    <div key={team.id} className="team-card">
+                        <div className="team-card-content">
+                            <div className="team-card-info">
+                                <Users className="team-icon" />
+                                <div className="team-details">
+                                    <h3 className="team-name">{team.teamId}</h3>
+                                    <div className="team-meta">
+                                        <p>{team.members.length} members</p>
+                                        <p>Registered: {team.registrationDate}</p>
                                     </div>
                                 </div>
                             </div>
-                            <div className="flex items-center gap-4">
-                                <span className={`px-3 py-1 rounded-full text-sm ${team.status === 'approved' ? 'bg-green-100 text-green-800' : team.status === 'rejected' ? 'bg-red-100 text-red-800' : 'bg-yellow-100 text-yellow-800'}`}>
+                            <div className="team-actions">
+                                <span className={`status-badge ${team.status}`}>
                                     {team.status.charAt(0).toUpperCase() + team.status.slice(1)}
                                 </span>
                                 <button
                                     onClick={() => setSelectedTeam(team.id)}
-                                    className="px-4 py-2 text-indigo-600 hover:bg-indigo-50 rounded-lg"
+                                    className="view-details-button"
                                 >
                                     View Details
                                 </button>
