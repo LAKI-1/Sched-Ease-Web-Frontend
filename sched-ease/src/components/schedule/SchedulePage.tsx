@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import Calendar from './Calendar';
+import '../../css/SchedulePage.css';
 
 export default function SchedulePage() {
     const [selectedDate, setSelectedDate] = useState(new Date());
@@ -23,9 +24,9 @@ export default function SchedulePage() {
     ];
 
     return (
-        <div className="space-y-6">
-            <div className="border-b border-gray-200 pb-5">
-                <h1 className="text-2xl font-bold text-gray-900">Schedule Page</h1>
+        <div className="schedule-container">
+            <div className="page-header">
+                <h1 className="page-title">Schedule Page</h1>
             </div>
 
             <Calendar

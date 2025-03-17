@@ -1,0 +1,73 @@
+.calendar {
+    background-color: white;
+    border-radius: 0.5rem;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+}
+
+.calendar-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.nav-button {
+    padding: 0.5rem;
+    border-radius: 9999px;
+}
+
+.nav-button:hover {
+    background-color: #f3f4f6;
+}
+
+.nav-icon {
+    height: 1.25rem;
+    width: 1.25rem;
+}
+
+.date-display {
+    font-size: 1.125rem;
+    font-weight: 600;
+}
+
+.time-slots {
+    border-top-width: 1px;
+    border-color: #e5e7eb;
+}
+
+.time-slot {
+    display: flex;
+    align-items: center;
+    padding: 1rem;
+}
+
+.time-slot:hover {
+    background-color: #f9fafb;
+}
+
+.time-label {
+    width: 5rem;
+    font-size: 0.875rem;
+    color: #4b5563;
+}
+
+.events-container {
+    flex: 1;
+    margin-left: 1rem;
+}
+
+.event {
+    padding: 0.5rem;
+    border-radius: 0.375rem;
+}
+
+.event.session {
+    background-color: #dbeafe;
+    color: #1e40af;
+}
+
+.event.availability {
+    background-color: #d1fae5;
+    color: #065f46;
+} 

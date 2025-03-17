@@ -1,5 +1,6 @@
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { formatDate, generateTimeSlots } from '../../lib/utils';
+import '../../css/Calendar.css';
 
 interface CalendarProps {
     selectedDate: Date;
@@ -31,38 +32,34 @@ export default function Calendar({ selectedDate, onDateChange, events }: Calenda
     };
 
     return (
-        <div className="bg-white rounded-lg shadow">
-            <div className="flex items-center justify-between p-4 border-b">
+        <div className="calendar">
+            <div className="calendar-header">
                 <button
                     onClick={handlePrevDay}
-                    className="p-2 hover:bg-gray-100 rounded-full"
+                    className="nav-button"
                 >
-                    <ChevronLeft className="h-5 w-5" />
+                    <ChevronLeft className="nav-icon" />
                 </button>
-                <h2 className="text-lg font-semibold">{formatDate(selectedDate)}</h2>
+                <h2 className="date-display">{formatDate(selectedDate)}</h2>
                 <button
                     onClick={handleNextDay}
-                    className="p-2 hover:bg-gray-100 rounded-full"
+                    className="nav-button"
                 >
-                    <ChevronRight className="h-5 w-5" />
+                    <ChevronRight className="nav-icon" />
                 </button>
             </div>
 
-            <div className="divide-y">
+            <div className="time-slots">
                 {timeSlots.map((time) => {
                     const currentEvents = events.filter(event => event.startTime === time);
                     return (
-                        <div key={time} className="flex items-center p-4 hover:bg-gray-50">
-                            <div className="w-20 text-sm text-gray-600">{time}</div>
-                            <div className="flex-1 ml-4">
+                        <div key={time} className="time-slot">
+                            <div className="time-label">{time}</div>
+                            <div className="events-container">
                                 {currentEvents.map((event) => (
                                     <div
                                         key={event.id}
-                                        className={`p-2 rounded ${
-                                            event.type === 'session'
-                                                ? 'bg-blue-100 text-blue-800'
-                                                : 'bg-green-100 text-green-800'
-                                        }`}
+                                        className={`event ${event.type}`}
                                     >
                                         {event.title}
                                     </div>
