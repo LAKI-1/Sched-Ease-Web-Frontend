@@ -1,0 +1,161 @@
+/* Login Page Layout */
+.login-container {
+    height: 100vh;
+    display: flex;
+    overflow: hidden;
+}
+
+/* Logo Section */
+.logo-section {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    width: 50%;
+    background-color: #dbeafe;
+    border-right: 1px solid #e5e7eb;
+}
+
+.logo-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+}
+
+.logo-image {
+    width: 66.666667%;
+    animation: fadeIn 0.5s ease-in;
+}
+
+/* Login Form Section */
+.login-form-section {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 2rem;
+    background-color: white;
+    border-left: 1px solid #e5e7eb;
+}
+
+.form-container {
+    width: 100%;
+    max-width: 28rem;
+}
+
+.form-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.header-icon {
+    height: 3rem;
+    width: 3rem;
+    color: #1d4ed8;
+    margin: 0 auto;
+    margin-bottom: 0.5rem;
+}
+
+.header-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #111827;
+}
+
+.brand-name {
+    color: #1d4ed8;
+}
+
+/* Error Message */
+.error-message {
+    padding: 0.75rem;
+    background-color: #fef2f2;
+    border: 1px solid #fecaca;
+    color: #dc2626;
+    font-size: 0.875rem;
+    border-radius: 0.375rem;
+    text-align: center;
+    margin-bottom: 1.5rem;
+}
+
+/* Form Layout */
+.login-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    width: 100%;
+}
+
+/* Role Selection */
+.role-label {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #374151;
+}
+
+.role-grid {
+    margin-top: 0.5rem;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+}
+
+.role-button {
+    transition: all 0.3s;
+}
+
+.role-button.active {
+    background-color: #1d4ed8;
+    color: white;
+}
+
+.role-button.inactive {
+    background-color: #e5e7eb;
+}
+
+.role-button.inactive:hover {
+    background-color: #d1d5db;
+}
+
+/* Submit Button */
+.submit-button {
+    width: 100%;
+    background-color: #1d4ed8;
+    color: white;
+    transition: all 0.3s;
+}
+
+.submit-button:hover {
+    background-color: #1e40af;
+}
+
+/* Responsive Design */
+@media (min-width: 640px) {
+    .login-form-section {
+        padding: 3rem;
+    }
+}
+
+@media (min-width: 1024px) {
+    .logo-section {
+        display: flex;
+    }
+    
+    .login-form-section {
+        width: 50%;
+        padding: 4rem;
+    }
+}
+
+/* Animation */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+} 
