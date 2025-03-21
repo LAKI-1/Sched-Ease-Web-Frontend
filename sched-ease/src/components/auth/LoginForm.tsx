@@ -53,6 +53,9 @@ export default function LoginForm() {
         setIsLoading(true);
 
         try {
+            // const { error: logoutError } = await supabase.auth.signOut();
+
+            // if (logoutError) throw logoutError;
             // const { data, error } = await supabase.auth.signInWithOAuth({ provider: 'google', options: { queryParams: { prompt: 'select_account', access_type: 'offline', }, }, });
             const { data, error } = await supabase.auth.signInWithOAuth({
                 provider: 'google',
@@ -61,8 +64,8 @@ export default function LoginForm() {
                         prompt: 'select_account',
                         access_type: 'offline',
                     },
-                    // redirectTo: `${window.location.origin}/loginform`
-                    redirectTo: `${window.location.origin}`
+                    redirectTo: `${window.location.origin}/loginform`
+                    // redirectTo: `${window.location.origin}`
                     // redirectTo: `/`
                 }
             });
