@@ -1,0 +1,24 @@
+.notification-button {
+    position: relative;
+    color: #4b5563;
+    transition: color 0.2s;
+}
+
+.notification-button:hover {
+    color: #1d4ed8;
+}
+
+.notification-badge {
+    position: absolute;
+    top: -0.25rem;
+    right: -0.25rem;
+    height: 1rem;
+    width: 1rem;
+    background-color: #2563eb;
+    border-radius: 9999px;
+    color: white;
+    font-size: 0.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+} 

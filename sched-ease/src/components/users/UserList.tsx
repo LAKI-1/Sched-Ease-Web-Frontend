@@ -1,4 +1,5 @@
 import { User } from '../../types/auth';
+import '../../css/UserList.css';
 
 interface UserListProps {
     users: User[];
@@ -7,28 +8,28 @@ interface UserListProps {
 
 export default function UserList({ users, onUserSelect }: UserListProps) {
     return (
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="user-list-grid">
             {users.map((user) => (
                 <div
                     key={user.id}
-                    className="bg-white rounded-lg shadow hover:shadow-md transition-shadow"
+                    className="user-card"
                 >
-                    <div className="p-6">
-                        <div className="flex items-center">
+                    <div className="user-card-content">
+                        <div className="user-info-container">
                             <img
-                                className="h-12 w-12 rounded-full"
+                                className="user-avatar"
                                 src={user.avatar}
                                 alt={user.name}
                             />
-                            <div className="ml-4">
-                                <h3 className="text-lg font-medium text-gray-900">{user.name}</h3>
-                                <p className="text-sm text-gray-500">{user.email}</p>
+                            <div className="user-details">
+                                <h3 className="user-name">{user.name}</h3>
+                                <p className="user-email">{user.email}</p>
                             </div>
                         </div>
-                        <div className="mt-4">
+                        <div className="button-container">
                             <button
                                 onClick={() => onUserSelect(user)}
-                                className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors"
+                                className="view-profile-button"
                             >
                                 View Profile
                             </button>

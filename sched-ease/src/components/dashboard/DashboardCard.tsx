@@ -1,42 +1,38 @@
+import React from 'react';
 import { LucideIcon } from 'lucide-react';
 
-interface DashboardCardProps {
+// Update the props interface to include bgColor and iconColor
+export interface DashboardCardProps {
     title: string;
     description: string;
     footer: string;
     icon: LucideIcon;
+    bgColor?: string;
+    iconColor?: string;
 }
 
-export default function DashboardCard({
-                                          title,
-                                          description,
-                                          footer,
-                                          icon: Icon,
-                                      }: DashboardCardProps) {
+const DashboardCard: React.FC<DashboardCardProps> = ({
+                                                         title,
+                                                         description,
+                                                         footer,
+                                                         icon: Icon,
+                                                         bgColor = 'bg-gradient-to-br from-purple-50 to-purple-100',
+                                                         iconColor = 'text-purple-600'
+                                                     }) => {
     return (
-        <div className="bg-white overflow-hidden shadow rounded-lg">
-            <div className="p-5">
-                <div className="flex items-center">
-                    <div className="flex-shrink-0">
-                        <Icon className="h-6 w-6 text-blue-600" />
-                    </div>
-                    <div className="ml-5 w-0 flex-1">
-                        <dl>
-                            <dt className="text-sm font-medium text-gray-500 truncate">
-                                {title}
-                            </dt>
-                            <dd className="text-lg font-medium text-gray-900">
-                                {description}
-                            </dd>
-                        </dl>
-                    </div>
+        <div className={`rounded-lg p-5 shadow-sm transition-all hover:shadow-md ${bgColor}`}>
+            <div className="flex items-center justify-between">
+                <h3 className="font-medium text-gray-800">{title}</h3>
+                <div className={`rounded-full p-2 ${iconColor.replace('text-', 'bg-').replace('-600', '-100').replace('-700', '-100')}`}>
+                    <Icon className={`h-5 w-5 ${iconColor}`} />
                 </div>
             </div>
-            <div className="bg-gray-50 px-5 py-3">
-                <div className="text-sm text-gray-500">
-                    {footer}
-                </div>
+            <p className="mt-2 text-sm text-gray-600">{description}</p>
+            <div className="mt-4 pt-3 border-t border-gray-100 text-xs text-gray-500">
+                {footer}
             </div>
         </div>
     );
-}
+};
+
+export default DashboardCard;

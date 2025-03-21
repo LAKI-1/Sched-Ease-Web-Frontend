@@ -14,7 +14,7 @@ const studentLinks = [
 const lecturerLinks = [
     { name: 'Dashboard', href: '/dashboard', icon: Home },
     { name: 'Availability', href: '/availability', icon: Clock },
-    { name: 'Schedule', href: '/schedule', icon: Calendar },
+    { name: 'Schedule', href: '/schedule-page', icon: Calendar },
     { name: 'Teams', href: '/teams', icon: Users },
     { name: 'Feedback', href: '/feedback', icon: MessageSquare},
     { name: 'Settings', href: '/settings', icon: Settings }
@@ -22,7 +22,7 @@ const lecturerLinks = [
 
 const sdgpAdminLinks = [
     { name: 'Dashboard', href: '/dashboard', icon: Home },
-    { name: 'Master Calendar', href: '/masterCalendar', icon: Calendar },
+    { name: 'Master Calendar', href: '/master-calendar', icon: Calendar },
     { name: 'Teams', href: '/teams', icon: Users },
     { name: 'Lecturers', href: '/lecturers', icon: Users },
     { name: 'Feedback', href: '/feedback', icon: MessageSquare},
@@ -44,7 +44,7 @@ export default function Navigation() {
             user?.role === 'sdgp_admin' ? sdgpAdminLinks : adminLinks;
 
     return (
-        <nav className="hidden md:flex items-center space-x-4">
+        <nav className="hidden md:flex items-center space-x-4 z-0 relative">
             {links.map((link) => {
                 const Icon = link.icon;
                 return (

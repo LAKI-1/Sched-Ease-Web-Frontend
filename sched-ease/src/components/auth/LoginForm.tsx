@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { LogIn } from 'lucide-react';
 import { useAuthStore } from '../../lib/store/authStore';
 import { loginUser, loginGoogleUser } from '../../lib/api/auth';
 import { UserRole } from '../../types/auth';
 import Button from '../ui/Button';
 import Input from '../ui/Input';
+import Logo from '../../assets/SchedEase.png';
+import '../../css/LoginForm.css';
 // import { createClient } from '@supabase/supabase-js';
 import { supabase } from '../../components/supabase/supabaseClient';
 
@@ -20,6 +23,14 @@ export default function LoginForm() {
     const [error, setError] = useState('');
 
     const login = useAuthStore((state) => state.login);
+
+    // Disable scrolling when the login form is displayed
+    useEffect(() => {
+        document.body.style.overflow = 'hidden';
+        return () => {
+            document.body.style.overflow = '';
+        };
+    }, []);
 
     useEffect(() => {
         const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
@@ -89,29 +100,35 @@ export default function LoginForm() {
     };
 
     return (
-        <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
-            <div className="sm:mx-auto sm:w-full sm:max-w-md">
-                <div className="flex justify-center">
-                    <LogIn className="h-12 w-12 text-blue-700" />
+        <div className="login-container">
+            {/* Left Side - Logo with Full Background Coverage */}
+            <div className="logo-section">
+                <div className="logo-wrapper">
+                    <img src={Logo} alt="Sched-Ease Logo" className="logo-image" />
                 </div>
-                <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-                    Sign in to Sched-Ease Portal
-                </h2>
             </div>
 
-            <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-                <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
+            {/* Right Side - Login Form */}
+            <div className="login-form-section">
+                <div className="form-container">
+                    <div className="form-header">
+                        <LogIn className="header-icon" />
+                        <h2 className="header-title">
+                            Sign in to <span className="brand-name">Sched-Ease</span> Portal
+                        </h2>
+                    </div>
+
                     {error && (
-                        <div className="mb-4 p-3 rounded bg-red-50 border border-red-200 text-red-600">
+                        <div className="error-message">
                             {error}
                         </div>
                     )}
 
-                    <form className="space-y-6" onSubmit={handleSubmit}>
+                    <form className="login-form" onSubmit={handleSubmit}>
                         <Input
                             id="email"
                             type="email"
-                            label="Email address"
+                            label="Email Address"
                             required
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
@@ -126,43 +143,28 @@ export default function LoginForm() {
                             onChange={(e) => setPassword(e.target.value)}
                         />
 
+                        {/* Role Selection */}
                         <div>
-                            <label className="block text-sm font-medium text-gray-700">Role</label>
-                            <div className="mt-2 grid grid-cols-2 gap-3">
-                                <Button
-                                    type="button"
-                                    variant={role === 'student' ? 'primary' : 'secondary'}
-                                    onClick={() => setRole('student')}
-                                >
-                                    Student
-                                </Button>
-                                <Button
-                                    type="button"
-                                    variant={role === 'lecturer' ? 'primary' : 'secondary'}
-                                    onClick={() => setRole('lecturer')}
-                                >
-                                    Lecturer
-                                </Button>
-                                <Button
-                                    type="button"
-                                    variant={role === 'sdgp_admin' ? 'primary' : 'secondary'}
-                                    onClick={() => setRole('sdgp_admin')}
-                                >
-                                    SDGP Admin
-                                </Button>
-                                <Button
-                                    type="button"
-                                    variant={role === 'admin' ? 'primary' : 'secondary'}
-                                    onClick={() => setRole('admin')}
-                                >
-                                    Admin
-                                </Button>
+                            <label className="role-label">Role</label>
+                            <div className="role-grid">
+                                {['student', 'lecturer', 'sdgp_admin', 'admin'].map((r) => (
+                                    <Button
+                                        key={r}
+                                        type="button"
+                                        variant={role === r ? 'primary' : 'secondary'}
+                                        onClick={() => setRole(r as UserRole)}
+                                        className={`role-button ${role === r ? 'active' : 'inactive'}`}
+                                    >
+                                        {r.charAt(0).toUpperCase() + r.slice(1).replace('_', ' ')}
+                                    </Button>
+                                ))}
                             </div>
                         </div>
 
+                        {/* Submit Button */}
                         <Button
                             type="submit"
-                            className="w-full"
+                            className="submit-button"
                             isLoading={isLoading}
                         >
                             Sign in
