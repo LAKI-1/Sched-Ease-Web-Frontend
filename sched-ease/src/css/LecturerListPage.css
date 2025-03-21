@@ -1,178 +1,316 @@
+.lecturer-page {
+  min-height: 100vh;
+  background-color: #f9fafb;
+}
+
 .lecturer-container {
-    max-width: 80rem;
-    margin: 0 auto;
-    padding: 2rem 1rem;
+  max-width: 80rem;
+  margin: 0 auto;
+  padding: 2rem 1rem;
 }
 
 @media (min-width: 640px) {
-    .lecturer-container {
-        padding: 2rem 1.5rem;
-    }
+  .lecturer-container {
+    padding: 2rem 1.5rem;
+  }
 }
 
 @media (min-width: 1024px) {
-    .lecturer-container {
-        padding: 2rem;
-    }
+  .lecturer-container {
+    padding: 2rem;
+  }
 }
 
-.header-wrapper {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 2rem;
+.header-section {
+  background-color: white;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  border-radius: 0.5rem;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
 }
 
-.header-title-container {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
+.header-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+}
+
+.header-title-section {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.header-icon {
+  color: #4f46e5;
 }
 
 .header-title {
-    font-size: 1.5rem;
-    font-weight: 600;
-    color: #111827;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #111827;
 }
 
-.add-lecturer-button {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.5rem 1rem;
-    background-color: #4f46e5;
-    color: white;
-    border-radius: 0.5rem;
-    transition: background-color 0.2s;
+.header-subtitle {
+  color: #4b5563;
 }
 
-.add-lecturer-button:hover {
-    background-color: #4338ca;
+.add-faculty-button {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background-color: #4f46e5;
+  color: white;
+  border-radius: 0.5rem;
+  transition: background-color 0.2s;
 }
 
-/* Add Lecturer Form */
-.form-container {
-    background-color: white;
-    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
-    border-radius: 0.5rem;
-    padding: 1.5rem;
-    margin-bottom: 1.5rem;
+.add-faculty-button:hover {
+  background-color: #4338ca;
+}
+
+.search-container {
+  position: relative;
+}
+
+.search-icon {
+  position: absolute;
+  left: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #9ca3af;
+}
+
+.search-input {
+  width: 100%;
+  padding: 0.5rem 1rem 0.5rem 2.5rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+}
+
+.search-input:focus {
+  outline: none;
+  ring: 2px solid #4f46e5;
+  border-color: transparent;
+}
+
+.error-message {
+  background-color: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #b91c1c;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.add-lecturer-form {
+  background-color: white;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  border-radius: 0.5rem;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.form-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
 }
 
 .form-title {
-    font-size: 1.125rem;
-    font-weight: 600;
-    margin-bottom: 1rem;
+  font-size: 1.125rem;
+  font-weight: 600;
 }
 
-.form-content {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-}
-
-.form-field {
-    display: flex;
-    flex-direction: column;
+.form-group {
+  margin-bottom: 1rem;
 }
 
 .form-label {
-    display: block;
-    font-size: 0.875rem;
-    font-weight: 500;
-    color: #374151;
-    margin-bottom: 0.25rem;
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #374151;
+  margin-bottom: 0.25rem;
 }
 
 .form-input {
-    width: 100%;
-    border-radius: 0.5rem;
-    border: 1px solid #d1d5db;
-    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-    padding: 0.5rem;
+  width: 100%;
+  border-radius: 0.5rem;
+  border: 1px solid #d1d5db;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
 }
 
 .form-input:focus {
-    border-color: #4f46e5;
-    box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
-    outline: none;
+  outline: none;
+  ring: 2px solid #4f46e5;
+  border-color: transparent;
 }
 
-.form-buttons {
-    display: flex;
-    justify-content: flex-end;
-    gap: 0.75rem;
-    margin-top: 1rem;
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  padding-top: 1rem;
 }
 
 .cancel-button {
-    padding: 0.5rem 1rem;
-    border: 1px solid #d1d5db;
-    border-radius: 0.5rem;
-    transition: background-color 0.2s;
+  padding: 0.5rem 1rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  transition: background-color 0.2s;
 }
 
 .cancel-button:hover {
-    background-color: #f9fafb;
+  background-color: #f9fafb;
 }
 
 .submit-button {
-    padding: 0.5rem 1rem;
-    background-color: #4f46e5;
-    color: white;
-    border-radius: 0.5rem;
-    transition: background-color 0.2s;
+  padding: 0.5rem 1rem;
+  background-color: #4f46e5;
+  color: white;
+  border-radius: 0.5rem;
+  transition: background-color 0.2s;
 }
 
 .submit-button:hover {
-    background-color: #4338ca;
+  background-color: #4338ca;
 }
 
-/* Lecturer Grid */
+.empty-state {
+  text-align: center;
+  padding: 3rem 0;
+  background-color: white;
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+}
+
+.empty-state-icon {
+  margin: 0 auto;
+  color: #9ca3af;
+  margin-bottom: 1rem;
+}
+
+.empty-state-text {
+  color: #6b7280;
+  font-size: 1.125rem;
+}
+
 .lecturer-grid {
-    display: grid;
-    gap: 1.5rem;
-    grid-template-columns: repeat(1, 1fr);
+  display: grid;
+  gap: 1.5rem;
 }
 
 @media (min-width: 768px) {
-    .lecturer-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
+  .lecturer-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
 @media (min-width: 1024px) {
-    .lecturer-grid {
-        grid-template-columns: repeat(3, 1fr);
-    }
+  .lecturer-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
 }
 
 .lecturer-card {
-    background-color: white;
-    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
-    border-radius: 0.5rem;
-    padding: 1.5rem;
+  background-color: white;
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+  transition: box-shadow 0.2s;
 }
 
-.lecturer-name {
-    font-size: 1.125rem;
-    font-weight: 600;
-    margin-bottom: 0.5rem;
+.lecturer-card:hover {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.lecturer-card-content {
+  padding: 1.5rem;
 }
 
 .lecturer-info {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-    color: #4b5563;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.lecturer-avatar {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.avatar-icon-container {
+  background-color: #e0e7ff;
+  border-radius: 9999px;
+  padding: 0.5rem;
+}
+
+.avatar-icon {
+  color: #4f46e5;
+}
+
+.lecturer-name {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #111827;
+}
+
+.lecturer-short-name {
+  font-size: 0.875rem;
+  color: #4f46e5;
+  font-weight: 500;
+}
+
+.lecturer-contact {
+  margin-top: 0.75rem;
 }
 
 .lecturer-email {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #4b5563;
 }
 
-.info-label {
-    font-weight: 600;
+.lecturer-email:hover {
+  color: #4f46e5;
+  transition: color 0.2s;
+}
+
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+}
+
+.loading-content {
+  text-align: center;
+}
+
+.loading-spinner {
+  animation: spin 1s linear infinite;
+  height: 2rem;
+  width: 2rem;
+  color: #4f46e5;
+  margin: 0 auto;
+  margin-bottom: 1rem;
+}
+
+.loading-text {
+  color: #4b5563;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 } 
