@@ -6,6 +6,7 @@ import { useAuthStore } from '../../lib/store/authStore';
 const studentLinks = [
     { name: 'Dashboard', href: '/dashboard', icon: Home },
     { name: 'Team Registration', href: '/team-registration', icon: Users },
+    { name: 'Feedback Booking', href: '/feedback-session', icon: Users },
     { name: 'Group', href: '/groups', icon: Users },
     { name: 'Settings', href: '/settings', icon: Settings }
 ];
