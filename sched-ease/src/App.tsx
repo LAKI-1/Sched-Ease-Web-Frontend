@@ -14,6 +14,7 @@ import Availability from './components/schedule/Availability';
 import { Timetable } from './components/schedule/Timetable';
 import { MasterCalendar } from './components/schedule/MasterCalendar';
 import { TeamRegistration } from "./components/registration/TeamRegistration.tsx";
+import FeedbackSession from './components/schedule/FeedbackSession';
 import SchedulePage from './components/schedule/SchedulePage';
 import SettingsPage from './components/settings/SettingsPage';
 import SplashScreen from './components/Splash Screen/splashscreen';
@@ -85,6 +86,13 @@ const App: React.FC = () => {
                         <Route path="/groups" element={
                             <ProtectedRoute>
                                 <GroupListPage />
+                            </ProtectedRoute>
+                        }
+                        />
+
+                        <Route path="/feedback-session" element={
+                            <ProtectedRoute>
+                                <FeedbackSession />
                             </ProtectedRoute>
                         }
                         />
