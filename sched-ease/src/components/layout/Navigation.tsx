@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom';
-import { Calendar, Users, Settings, Home, Clock, MessageSquare } from 'lucide-react';
+import { Calendar, Users, Settings, Home, Clock } from 'lucide-react';
 import { cn } from '../../lib/utils';
 import { useAuthStore } from '../../lib/store/authStore';
 
@@ -7,7 +7,6 @@ const studentLinks = [
     { name: 'Dashboard', href: '/dashboard', icon: Home },
     { name: 'Team Registration', href: '/team-registration', icon: Users },
     { name: 'Group', href: '/groups', icon: Users },
-    { name: 'Feedback', href: '/feedback', icon: MessageSquare},
     { name: 'Settings', href: '/settings', icon: Settings }
 ];
 
@@ -16,7 +15,6 @@ const lecturerLinks = [
     { name: 'Availability', href: '/availability', icon: Clock },
     { name: 'Schedule', href: '/schedule-page', icon: Calendar },
     { name: 'Teams', href: '/teams', icon: Users },
-    { name: 'Feedback', href: '/feedback', icon: MessageSquare},
     { name: 'Settings', href: '/settings', icon: Settings }
 ];
 
@@ -25,13 +23,13 @@ const sdgpAdminLinks = [
     { name: 'Master Calendar', href: '/master-calendar', icon: Calendar },
     { name: 'Teams', href: '/teams', icon: Users },
     { name: 'Lecturers', href: '/lecturers', icon: Users },
-    { name: 'Feedback', href: '/feedback', icon: MessageSquare},
     { name: 'Settings', href: '/settings', icon: Settings }
 ];
 
 const adminLinks = [
     { name: 'Dashboard', href: '/dashboard', icon: Home },
     { name: 'Timetable', href: '/timetable', icon: Calendar },
+    { name: 'Lecturers', href: '/lecturers', icon: Users },
     { name: 'Settings', href: '/settings', icon: Settings }
 ];
 
