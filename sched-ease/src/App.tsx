@@ -12,7 +12,6 @@ import GroupListPage from './components/users/GroupListPage';
 import TeamListPage from './components/users/TeamListPage';
 import Availability from './components/schedule/Availability';
 import { Timetable } from './components/schedule/Timetable';
-import { Feedback } from './components/folder/Feedback';
 import { MasterCalendar } from './components/schedule/MasterCalendar';
 import { TeamRegistration } from "./components/registration/TeamRegistration.tsx";
 import SchedulePage from './components/schedule/SchedulePage';
@@ -107,13 +106,6 @@ const App: React.FC = () => {
                         <Route path="/teams" element={
                             <ProtectedRoute>
                                 <TeamListPage />
-                            </ProtectedRoute>
-                        }
-                        />
-
-                        <Route path="/feedback" element={
-                            <ProtectedRoute>
-                                <Feedback role={user?.role === 'sdgp_admin' ? 'sdgp_admin' : 'lecturer'} />
                             </ProtectedRoute>
                         }
                         />
