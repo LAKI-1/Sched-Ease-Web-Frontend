@@ -5,19 +5,19 @@ import '../../css/Timetable.css';
 
 const API_BASE_URL = 'http://localhost:8080/api';
 
-interface SessionRequestDTO {
-    lecturerIds: number[]; // Changed from Set to array
+interface SessionDTO {
+    lecturerIds: Set<number>;
     hallId: number;
     level: string;
     course: string;
     dayOfWeek: string;
     startTime: string;
     endTime: string;
-    lectureOrTutorial: 'Lecture' | 'Tutorial';
+    lectureOrTutorial: string;
     timeTableId: number;
 }
 
-interface SessionResponseDTO {
+interface GroupSession {
     id: string;
     group: string;
     lecturer: string;
@@ -28,38 +28,16 @@ interface SessionResponseDTO {
     type: 'Lecture' | 'Tutorial';
     building: string;
     classroom: string;
-    lecturerId: number;
-    hallId: number;
-    timeTableId: number;
-}
-
-interface Hall {
-    id: number;
-    name: string;
-    building: string;
-    capacity: number;
-}
-
-interface Lecturer {
-    id: number;
-    name: string;
-    email: string;
-    nameShort: string;
-}
-
-interface TutorialGroup {
-    id: number;
-    groupNo: string;
-    course: string;
-    semester: string;
+    lecturerId?: number;
+    hallId?: number;
+    timeTableId?: number;
 }
 
 export function Timetable() {
     // API functions
     const api = {
-        async saveSessions(groupId: number, sessions: SessionRequestDTO[]): Promise<string> {
+        async saveSessions(groupId: number, sessions: SessionDTO[]): Promise<string> {
             try {
-                console.log('Saving sessions:', sessions);
                 const response = await axios.post(
                     `${API_BASE_URL}/sessions/add-to-group/${groupId}`,
                     sessions
@@ -73,48 +51,30 @@ export function Timetable() {
             }
         },
 
-        async getSessionsByGroup(groupId: number): Promise<SessionResponseDTO[]> {
+        async getHalls(): Promise<any[]> {
             try {
-                const response = await axios.get(`${API_BASE_URL}/sessions/group/${groupId}`);
-                return response.data;
-            } catch (error) {
-                throw new Error('Failed to fetch sessions');
-            }
-        },
-
-        async getHalls(): Promise<Hall[]> {
-            try {
-                const response = await axios.get(`${API_BASE_URL}/halls`);
+                const response = await axios.get(`${API_BASE_URL}/sessions/halls`);
                 return response.data;
             } catch (error) {
                 throw new Error('Failed to fetch halls');
             }
         },
 
-        async getLecturers(): Promise<Lecturer[]> {
+        async getLecturers(): Promise<any[]> {
             try {
-                const response = await axios.get(`${API_BASE_URL}/lecturers`);
+                const response = await axios.get(`${API_BASE_URL}/sessions/lecturers`);
                 return response.data;
             } catch (error) {
                 throw new Error('Failed to fetch lecturers');
-            }
-        },
-
-        async getTutorialGroups(): Promise<TutorialGroup[]> {
-            try {
-                const response = await axios.get(`${API_BASE_URL}/tutorial-groups`);
-                return response.data;
-            } catch (error) {
-                throw new Error('Failed to fetch tutorial groups');
             }
         }
     };
 
     const [selectedGroup, setSelectedGroup] = useState<string>('CS-G1');
-    const [sessions, setSessions] = useState<SessionResponseDTO[]>([]);
+    const [sessions, setSessions] = useState<GroupSession[]>([]);
     const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
-    const [halls, setHalls] = useState<Hall[]>([]);
-    const [lecturers, setLecturers] = useState<Lecturer[]>([]);
+    const [halls, setHalls] = useState<any[]>([]);
+    const [lecturers, setLecturers] = useState<any[]>([]);
     const [isLoading, setIsLoading] = useState({
         halls: true,
         lecturers: true
@@ -123,12 +83,7 @@ export function Timetable() {
         halls: '',
         lecturers: ''
     });
-
-    const [tutorialGroups, setTutorialGroups] = useState<TutorialGroup[]>([]);
-    const [isLoadingGroups, setIsLoadingGroups] = useState(true);
-    const [loadErrorGroups, setLoadErrorGroups] = useState('');
-
-    const defaultSession: SessionResponseDTO = {
+    const [newSession, setNewSession] = useState<GroupSession>({
         id: '',
         group: selectedGroup,
         lecturer: '',
@@ -139,12 +94,10 @@ export function Timetable() {
         type: 'Lecture',
         building: '',
         classroom: '',
-        lecturerId: 0,
-        hallId: 0,
-        timeTableId: 1
-    };
-
-    const [newSession, setNewSession] = useState<SessionResponseDTO>(defaultSession);
+        lecturerId: undefined,
+        hallId: undefined,
+        timeTableId: 1 // You might want to make this dynamic based on your needs
+    });
 
     // Updated fetch halls and lecturers with loading states
     useEffect(() => {
@@ -184,77 +137,64 @@ export function Timetable() {
 
     // Load saved sessions when component mounts or group changes
     useEffect(() => {
-        const fetchSessions = async () => {
-            try {
-                // Extract group number from group string (e.g., "CS-G1" -> 1)
-                const groupNumber = parseInt(selectedGroup.split('-G')[1]);
-                const fetchedSessions = await api.getSessionsByGroup(groupNumber);
-                setSessions(fetchedSessions);
-            } catch (error) {
-                console.error('Error fetching sessions:', error);
-                setSessions([]); // Start with empty array if error
-            }
-        };
-
-        fetchSessions();
+        const savedSessions = localStorage.getItem(`sessions_${selectedGroup}`);
+        if (savedSessions) {
+            setSessions(JSON.parse(savedSessions));
+        } else {
+            setSessions([]); // Start with empty array if no saved sessions
+        }
     }, [selectedGroup]);
 
-    // Add this useEffect for fetching tutorial groups
-    useEffect(() => {
-        const fetchTutorialGroups = async () => {
-            try {
-                const groups = await api.getTutorialGroups();
-                setTutorialGroups(groups);
-                setIsLoadingGroups(false);
-            } catch (error) {
-                setLoadErrorGroups('Failed to load tutorial groups. Please try again.');
-                setIsLoadingGroups(false);
-            }
-        };
-
-        fetchTutorialGroups();
-    }, []);
-
     const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
+    const times = Array.from({ length: 9 }, (_, i) => `${String(i + 9).padStart(2, '0')}:00`);
+    const endTimes = Array.from({ length: 18 }, (_, i) => {
+        const hour = Math.floor(i / 2) + 9;
+        const minute = i % 2 === 0 ? '00' : '30';
+        return `${String(hour).padStart(2, '0')}:${minute}`;
+    });
 
-    // Define specific start and end times
-    const startTimes = ['08:30', '10:30', '13:30', '15:30'];
-    const endTimes = ['10:30', '12:30', '15:30', '17:30'];
-
-    // For the timetable grid display
-    const times = ['08:30', '10:30', '12:30', '13:30', '15:30'];
+    const filteredSessions = sessions.filter(session => session.group === selectedGroup);
 
     const handleAddSession = () => {
         if (newSession.lecturer && newSession.building && newSession.classroom) {
+            // Validate that end time is after start time
             if (newSession.endTime <= newSession.startTime) {
                 alert('End time must be after start time');
                 return;
             }
 
-            const foundHall: Hall | undefined = halls.find(h => h.name === newSession.classroom);
-            const foundLecturer: Lecturer | undefined = lecturers.find(l => l.nameShort === newSession.lecturer);
+            // Find the corresponding hall and lecturer IDs
+            const hall = halls.find(h => h.name === newSession.building);
+            const lecturer = lecturers.find(l => l.name === newSession.lecturer);
 
-            if (!foundHall || !foundLecturer) {
+            if (!hall || !lecturer) {
                 alert('Invalid hall or lecturer selected');
                 return;
             }
 
-            // Now TypeScript knows these are definitely Hall and Lecturer objects
-            const hall: Hall = foundHall;
-            const lecturer: Lecturer = foundLecturer;
-
-            const sessionToAdd: SessionResponseDTO = {
+            setSessions([...sessions, {
                 ...newSession,
                 id: (sessions.length + 1).toString(),
                 group: selectedGroup,
-                lecturer: lecturer.nameShort,
                 hallId: hall.id,
-                lecturerId: lecturer.id,
-                type: newSession.type
-            };
+                lecturerId: lecturer.id
+            }]);
 
-            setSessions([...sessions, sessionToAdd]);
-            setNewSession(defaultSession);
+            setNewSession({
+                id: '',
+                group: selectedGroup,
+                lecturer: '',
+                module: '',
+                date: 'Monday',
+                startTime: '09:00',
+                endTime: '10:30',
+                type: 'Lecture',
+                building: '',
+                classroom: '',
+                lecturerId: undefined,
+                hallId: undefined,
+                timeTableId: 1
+            });
         } else {
             alert('Please fill out all fields to add a session.');
         }
@@ -267,52 +207,31 @@ export function Timetable() {
     const handleSaveSessions = async () => {
         try {
             setSaveStatus('saving');
-            const groupNumber = parseInt(selectedGroup.split('-G')[1]);
 
-            // Less strict validation
-            const validSessions = sessions.filter(session => {
-                return session.lecturerId !== 0 && session.hallId !== 0;
-            });
-
-            if (validSessions.length === 0) {
-                alert('No valid sessions to save');
-                setSaveStatus('error');
-                setTimeout(() => setSaveStatus('idle'), 3000);
-                return;
-            }
-
-            // Extract course from the group name
-            const course = selectedGroup.split('-G')[0];
-
-            const sessionsToSave: SessionRequestDTO[] = validSessions.map(session => ({
-                // Convert Set to array
-                lecturerIds: [session.lecturerId],
-                hallId: session.hallId,
-                level: '1',
-                course: course,
+            // Convert sessions to backend DTO format
+            const sessionsToSave: SessionDTO[] = sessions.map(session => ({
+                lecturerIds: new Set([session.lecturerId!]),
+                hallId: session.hallId!,
+                level: '1', // You might want to make this dynamic
+                course: session.module,
                 dayOfWeek: session.date,
                 startTime: session.startTime,
                 endTime: session.endTime,
                 lectureOrTutorial: session.type,
-                timeTableId: session.timeTableId
+                timeTableId: session.timeTableId!
             }));
 
-            console.log('Saving sessions to group:', groupNumber);
-            console.log('Sessions data:', sessionsToSave);
+            // Extract group number from group string (e.g., "CS-G1" -> 1)
+            const groupNumber = parseInt(selectedGroup.split('-G')[1]);
 
             await api.saveSessions(groupNumber, sessionsToSave);
+
             setSaveStatus('saved');
-
-            // Refresh the sessions list after saving
-            const fetchedSessions = await api.getSessionsByGroup(groupNumber);
-            setSessions(fetchedSessions);
-
             setTimeout(() => setSaveStatus('idle'), 3000);
         } catch (error) {
-            console.error('Error saving sessions:', error);
-            alert(`Failed to save: ${error instanceof Error ? error.message : 'Unknown error'}`);
             setSaveStatus('error');
             setTimeout(() => setSaveStatus('idle'), 3000);
+            console.error('Error saving sessions:', error);
         }
     };
 
@@ -336,32 +255,21 @@ export function Timetable() {
             {/* Group Selector */}
             <div className="group-selector">
                 <label htmlFor="group-select" className="group-label">
-                    Tutorial Group
+                    Select Group
                 </label>
-                <div className="select-wrapper">
-                    <select
-                        id="group-select"
-                        value={selectedGroup}
-                        onChange={(e) => setSelectedGroup(e.target.value)}
-                        className="group-select"
-                        disabled={isLoadingGroups}
-                    >
-                        <option value="">Select Tutorial Group</option>
-                        {tutorialGroups.map(group => (
-                            <option key={group.id} value={`${group.course}-G${group.groupNo}`}>
-                                {group.course}-G{group.groupNo} ({group.semester})
-                            </option>
-                        ))}
-                    </select>
-                    {isLoadingGroups && (
-                        <div className="select-loading">
-                            <Loader size={16} className="loading-spinner" />
-                        </div>
-                    )}
-                </div>
-                {loadErrorGroups && (
-                    <div className="error-message">{loadErrorGroups}</div>
-                )}
+                <select
+                    id="group-select"
+                    value={selectedGroup}
+                    onChange={(e) => setSelectedGroup(e.target.value)}
+                    className="group-select"
+                >
+                    {[
+                        ...Array.from({ length: 40 }, (_, i) => `CS-G${i + 1}`),
+                        ...Array.from({ length: 20 }, (_, i) => `SE-G${i + 1}`)
+                    ].map(group => (
+                        <option key={group} value={group}>{group}</option>
+                    ))}
+                </select>
             </div>
 
             {/* Add Session Form */}
@@ -374,11 +282,11 @@ export function Timetable() {
                             <select
                                 value={newSession.lecturer}
                                 onChange={(e) => {
-                                    const lecturer = lecturers.find(l => l.nameShort === e.target.value);
+                                    const lecturer = lecturers.find(l => l.name === e.target.value);
                                     setNewSession({
                                         ...newSession,
                                         lecturer: e.target.value,
-                                        lecturerId: lecturer ? lecturer.id : 0
+                                        lecturerId: lecturer?.id
                                     });
                                 }}
                                 className="form-select"
@@ -386,8 +294,8 @@ export function Timetable() {
                             >
                                 <option value="">Select Lecturer</option>
                                 {lecturers.map(lecturer => (
-                                    <option key={lecturer.id} value={lecturer.nameShort}>
-                                        {lecturer.nameShort}
+                                    <option key={lecturer.id} value={lecturer.name}>
+                                        {lecturer.name}
                                     </option>
                                 ))}
                             </select>
@@ -400,6 +308,16 @@ export function Timetable() {
                         {loadError.lecturers && (
                             <div className="error-message">{loadError.lecturers}</div>
                         )}
+                    </div>
+                    <div className="form-group">
+                        <label className="form-label">Module</label>
+                        <input
+                            type="text"
+                            value={newSession.module}
+                            onChange={(e) => setNewSession({ ...newSession, module: e.target.value })}
+                            className="form-input"
+                            placeholder="e.g., CS101"
+                        />
                     </div>
                     <div className="form-group">
                         <label className="form-label">Date</label>
@@ -417,20 +335,10 @@ export function Timetable() {
                         <label className="form-label">Start Time</label>
                         <select
                             value={newSession.startTime}
-                            onChange={(e) => {
-                                const selectedStartTime = e.target.value;
-                                // Find the next valid end time based on the selected start time
-                                const validEndTime = endTimes.find(time => time > selectedStartTime) || endTimes[0];
-                                setNewSession({
-                                    ...newSession,
-                                    startTime: selectedStartTime,
-                                    endTime: validEndTime
-                                });
-                            }}
+                            onChange={(e) => setNewSession({ ...newSession, startTime: e.target.value })}
                             className="form-select"
                         >
-                            <option value="">Select Start Time</option>
-                            {startTimes.map(time => (
+                            {endTimes.slice(0, -1).map(time => (
                                 <option key={time} value={time}>{time}</option>
                             ))}
                         </select>
@@ -441,15 +349,10 @@ export function Timetable() {
                             value={newSession.endTime}
                             onChange={(e) => setNewSession({ ...newSession, endTime: e.target.value })}
                             className="form-select"
-                            disabled={!newSession.startTime}
                         >
-                            <option value="">Select End Time</option>
-                            {endTimes
-                                .filter(time => time > newSession.startTime)
-                                .map(time => (
-                                    <option key={time} value={time}>{time}</option>
-                                ))
-                            }
+                            {endTimes.slice(1).map(time => (
+                                <option key={time} value={time}>{time}</option>
+                            ))}
                         </select>
                     </div>
                     <div className="form-group">
@@ -469,21 +372,21 @@ export function Timetable() {
                             <select
                                 value={newSession.building}
                                 onChange={(e) => {
-                                    const hall = halls.find(h => h.building === e.target.value);
+                                    const hall = halls.find(h => h.name === e.target.value);
                                     setNewSession({
                                         ...newSession,
-                                        building: e.target.value,
+                                        building: hall?.building || '',
                                         classroom: hall?.name || '',
-                                        hallId: hall ? hall.id : 0
+                                        hallId: hall?.id
                                     });
                                 }}
                                 className="form-select"
                                 disabled={isLoading.halls}
                             >
                                 <option value="">Select Building</option>
-                                {[...new Set(halls.map(hall => hall.building))].map(building => (
-                                    <option key={building} value={building}>
-                                        {building}
+                                {halls.map(hall => (
+                                    <option key={hall.id} value={hall.name}>
+                                        {hall.building} - {hall.name}
                                     </option>
                                 ))}
                             </select>
@@ -499,29 +402,13 @@ export function Timetable() {
                     </div>
                     <div className="form-group">
                         <label className="form-label">Classroom</label>
-                        <select
+                        <input
+                            type="text"
                             value={newSession.classroom}
-                            onChange={(e) => {
-                                const hall = halls.find(h => h.name === e.target.value);
-                                setNewSession({
-                                    ...newSession,
-                                    classroom: e.target.value,
-                                    hallId: hall ? hall.id : 0
-                                });
-                            }}
-                            className="form-select"
-                            disabled={!newSession.building}
-                        >
-                            <option value="">Select Classroom</option>
-                            {halls
-                                .filter(hall => hall.building === newSession.building)
-                                .map(hall => (
-                                    <option key={hall.id} value={hall.name}>
-                                        {hall.name}
-                                    </option>
-                                ))
-                            }
-                        </select>
+                            className="form-input"
+                            disabled
+                            placeholder="Automatically set from building selection"
+                        />
                     </div>
                 </div>
                 <button
@@ -545,7 +432,7 @@ export function Timetable() {
                             <React.Fragment key={time}>
                                 <div className="time-slot">{time}</div>
                                 {days.map(day => {
-                                    const session = sessions.find(s =>
+                                    const session = filteredSessions.find(s =>
                                         s.date === day &&
                                         s.startTime <= time &&
                                         time < s.endTime
