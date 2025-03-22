@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { useAuthStore } from './lib/store/authStore';
 import LoginForm from './components/auth/LoginForm';
+import OAuthRedirectHandler from './components/auth/OAuthRedirectHandler';
 import Header from './components/layout/Header';
 import AdminDashboard from './components/dashboard/AdminDashboard';
 import SDGPAdminDashboard from './components/dashboard/SDGPAdminDashboard';
@@ -44,9 +45,13 @@ const App: React.FC = () => {
                     <Routes>
                         <Route path="/login" element={isAuthenticated ? <Navigate to="/dashboard" /> : <LoginForm />} />
                         <Route path="/loginform" element={<LoginForm />} />
-                        {/* <Route path="/google" element={<GoogleLogin />} /> */}
+                        <Route path="/oauth-redirect" element={<OAuthRedirectHandler />} />
 
-                        {/* Protected Route for Dashboards */}
+                        <Route path="/admindashboard" element={<AdminDashboard />} />
+                        <Route path="/sdgpadmindashboard" element={<SDGPAdminDashboard />} />
+                        <Route path="/studentdashboard" element={<StudentDashboard />} />
+                        <Route path="/lecturerdashboard" element={<LecturerDashboard />} />
+
                         <Route path="/dashboard" element={
                             <ProtectedRoute>
                                 {user?.role === 'admin' ? (

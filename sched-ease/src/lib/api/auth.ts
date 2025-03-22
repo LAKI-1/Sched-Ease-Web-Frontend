@@ -47,10 +47,10 @@ export const loginGoogleUser = async (
     console.log("response: ", json);
 
     return {
-        id: json.SDGP_Student?.student?.id.toString() || "",
-        name: json.SDGP_Student?.student?.name || "",
-        email: json.SDGP_Student?.student?.email || "",
-        avatar: json.Metadata?.avatar_url || json.Metadata?.picture || "",
+        id: json.user?.id.toString() || "",
+        name: json.user?.name || "",
+        email: json.user?.email || "",
+        avatar: json.user?.avatar || "",
         role,
         token,
     };

@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import React, { useState, useEffect } from 'react';
 import { LogIn } from 'lucide-react';
 import { useAuthStore } from '../../lib/store/authStore';
 import { loginUser, loginGoogleUser } from '../../lib/api/auth';
@@ -54,7 +53,7 @@ export default function LoginForm() {
         } catch (err) {
             setError(err instanceof Error ? err.message : 'Failed to login');
         } finally {
-            setIsLoading(false);
+            // setIsLoading(false);
         }
     };
 
@@ -63,11 +62,33 @@ export default function LoginForm() {
         setError('');
         setIsLoading(true);
 
-        try {
-            // const { error: logoutError } = await supabase.auth.signOut();
+        // try {
 
-            // if (logoutError) throw logoutError;
-            // const { data, error } = await supabase.auth.signInWithOAuth({ provider: 'google', options: { queryParams: { prompt: 'select_account', access_type: 'offline', }, }, });
+        //     const { data, error } = await supabase.auth.signInWithOAuth({
+        //         provider: 'google',
+        //         options: {
+        //             queryParams: {
+        //                 prompt: 'select_account',
+        //                 access_type: 'offline',
+        //             },
+        //             redirectTo: `${window.location.origin}/loginform`
+        //             // redirectTo: `${window.location.origin}`
+        //             // redirectTo: `/`
+        //         }
+        //     });
+        //     console.log('OAuth Sign-In Data:', data);
+        //     if (error) throw error;
+
+        //     const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+        //     console.log('Session Data:', sessionData);
+        //     if (sessionError) throw sessionError;
+
+        //     const user = await loginGoogleUser(sessionData?.session?.access_token as string, role);
+        //     console.log('User:', user);
+        //     login(user);
+
+        // }
+        try {
             const { data, error } = await supabase.auth.signInWithOAuth({
                 provider: 'google',
                 options: {
@@ -75,23 +96,14 @@ export default function LoginForm() {
                         prompt: 'select_account',
                         access_type: 'offline',
                     },
-                    redirectTo: `${window.location.origin}/loginform`
-                    // redirectTo: `${window.location.origin}`
-                    // redirectTo: `/`
+                    redirectTo: `${window.location.origin}/oauth-redirect?role=${role}`
                 }
             });
-            console.log('OAuth Sign-In Data:', data);
+
             if (error) throw error;
+        }
 
-            const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
-            console.log('Session Data:', sessionData);
-            if (sessionError) throw sessionError;
-
-            const user = await loginGoogleUser(sessionData?.session?.access_token as string, role);
-            console.log('User:', user);
-            login(user);
-
-        } catch (err) {
+        catch (err) {
             console.error('Google Sign-In Error:', err);
             setError(err instanceof Error ? err.message : 'Google Sign-In failed');
         } finally {
