@@ -85,103 +85,14 @@
     color: #4f46e5;
 }
 
-/* Grid Layout */
+/* Remove team grid columns since we don't have team lead anymore */
 .team-grid {
-    display: grid;
-    gap: 1.5rem;
+    display: block;
 }
 
-@media (min-width: 768px) {
-    .team-grid {
-        grid-template-columns: 1fr 2fr;
-    }
-}
-
-/* Team Lead Card */
-.team-lead-card {
-    background-color: white;
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-    border-radius: 0.75rem;
-    overflow: hidden;
-    height: 100%;
-    border-top: 4px solid #f59e0b;
-}
-
-.team-lead-content {
-    padding: 1.5rem;
-}
-
-.team-lead-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1rem;
-}
-
-.team-lead-title {
-    font-weight: 600;
-    font-size: 1.125rem;
-    display: flex;
-    align-items: center;
-}
-
-.team-lead-icon {
-    color: #f59e0b;
-    margin-right: 0.5rem;
-}
-
-.team-lead-profile {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-.team-lead-avatar {
-    width: 5rem;
-    height: 5rem;
-    background: linear-gradient(to bottom right, #fbbf24, #d97706);
-    border-radius: 9999px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    font-size: 1.25rem;
-    font-weight: 700;
-    margin-bottom: 0.75rem;
-}
-
-.team-lead-name {
-    font-weight: 700;
-    font-size: 1.125rem;
-}
-
-.team-lead-id {
-    color: #4b5563;
-    font-size: 0.875rem;
-}
-
-.team-lead-contact {
-    margin-top: 0.5rem;
-    background-color: #f9fafb;
-    padding: 1rem;
-    border-radius: 0.5rem;
-}
-
-.contact-item {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    color: #374151;
-}
-
-.contact-icon {
-    color: #f59e0b;
-}
-
-.team-lead-bio {
-    font-size: 0.875rem;
-    color: #374151;
-    margin-bottom: 0.5rem;
+/* Add a full-width class for the team members card */
+.full-width {
+    width: 100%;
 }
 
 /* Team Members Section */
@@ -305,4 +216,4 @@
     border-radius: 9999px;
     margin-right: 0.5rem;
     margin-bottom: 0.5rem;
-} 
+}

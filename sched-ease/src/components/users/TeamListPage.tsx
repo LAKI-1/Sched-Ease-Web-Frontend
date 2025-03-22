@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Users, Mail, GraduationCap, CheckCircle, XCircle, Crown, IdCard } from 'lucide-react';
-import '../../css/TeamListPage.css';
+import { Users, Mail, GraduationCap, CheckCircle, XCircle, Crown } from 'lucide-react';
 
 interface TeamMember {
     id: number;
@@ -113,10 +112,10 @@ export default function TeamListPage() {
 
     if (isLoading) {
         return (
-            <div className="team-container">
-                <div className="loading-container">
-                    <div className="loading-spinner"></div>
-                    <p className="loading-text">Loading teams...</p>
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                <div className="text-center py-4">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+                    <p className="mt-2 text-gray-600">Loading teams...</p>
                 </div>
             </div>
         );
@@ -124,10 +123,13 @@ export default function TeamListPage() {
 
     if (error) {
         return (
-            <div className="team-container">
-                <div className="error-container">
-                    <p className="error-message">{error}</p>
-                    <button onClick={fetchTeams} className="retry-button">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                <div className="text-center py-4">
+                    <p className="text-red-500">{error}</p>
+                    <button
+                        onClick={fetchTeams}
+                        className="mt-2 text-blue-600 hover:text-blue-800"
+                    >
                         Try Again
                     </button>
                 </div>
@@ -140,59 +142,79 @@ export default function TeamListPage() {
         if (!team) return null;
 
         return (
-            <div className="team-container">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                 <button
                     onClick={() => {
                         setSelectedTeam(null);
                         setSelectedLeader(null);
                         setActionMessage(null);
                     }}
-                    className="back-button"
+                    className="text-blue-600 hover:text-blue-800 flex items-center gap-2 mb-6"
                 >
                     ← Back to Teams
                 </button>
 
-                <div className="team-details">
-                    <div className="team-header">
+                <div className="bg-white p-6 rounded-lg shadow-md">
+                    <div className="flex items-center justify-between mb-6">
                         <div>
-                            <h2 className="team-title">Team {team.teamId}</h2>
-                            <p className="team-group">Group: {team.course}-{String(team.groupNo).padStart(2, '0')}</p>
+                            <h2 className="text-2xl font-bold text-blue-600">
+                                Team {team.teamId}
+                            </h2>
+                            <p className="text-lg text-gray-600 mt-2">
+                                Group: {team.course}-{String(team.groupNo).padStart(2, '0')}
+                            </p>
+                            <p className="text-gray-600">Registration Date: {team.registrationDate}</p>
                         </div>
-                        <div className="status-indicator">
-                            <div className={`status-dot ${team.status}`} />
-                            <span className={`status-text ${team.status}`}>
-                                {team.status === 'pending' ? 'Pending Approval' :
-                                    team.status === 'approved' ? 'Approved' : 'Rejected'}
-                            </span>
+                        <div className="flex items-center">
+                            {team.status === 'pending' ? (
+                                <div className="flex items-center">
+                                    <div className="w-4 h-4 rounded-full bg-yellow-400 animate-pulse mr-2" />
+                                    <span className="text-yellow-600">Pending Approval</span>
+                                </div>
+                            ) : team.status === 'approved' ? (
+                                <div className="flex items-center">
+                                    <div className="w-4 h-4 rounded-full bg-green-400 mr-2" />
+                                    <span className="text-green-600">Approved</span>
+                                </div>
+                            ) : (
+                                <div className="flex items-center">
+                                    <div className="w-4 h-4 rounded-full bg-red-400 mr-2" />
+                                    <span className="text-red-600">Rejected</span>
+                                </div>
+                            )}
                         </div>
                     </div>
 
                     {actionMessage && (
-                        <div className={`action-message ${actionMessage.includes('Failed') ? 'error' : 'success'}`}>
-                            <p>{actionMessage}</p>
+                        <div className={`mb-6 p-4 ${actionMessage.includes('Failed') ? 'bg-red-50 border border-red-200' : 'bg-green-50 border border-green-200'} rounded-lg text-center`}>
+                            <p className={actionMessage.includes('Failed') ? 'text-red-600' : 'text-green-600'}>{actionMessage}</p>
                         </div>
                     )}
 
                     {team.status === 'pending' && (
-                        <div>
-                            <div className="leader-selection-warning">
-                                <p className="leader-selection-text">
+                        <div className="mb-6">
+                            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4">
+                                <p className="text-yellow-800 flex items-center gap-2">
                                     <Crown className="w-5 h-5" />
                                     Please select a team leader before approving the team
                                 </p>
                             </div>
-                            <div className="action-buttons">
+                            <div className="flex gap-2">
                                 <button
                                     onClick={() => handleApprove(team.id)}
                                     disabled={!selectedLeader}
-                                    className={`approve-button ${selectedLeader ? 'enabled' : 'disabled'}`}
+                                    className={`flex items-center gap-2 px-4 py-2 rounded-lg ${
+                                        selectedLeader
+                                            ? 'bg-green-600 text-white hover:bg-green-700'
+                                            : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                                    }`}
                                 >
                                     <CheckCircle size={20} />
                                     Approve with Selected Leader
                                 </button>
                                 <button
                                     onClick={() => handleReject(team.id)}
-                                    className="reject-button"
+                                    className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
                                 >
                                     <XCircle size={20} />
                                     Reject
@@ -201,44 +223,49 @@ export default function TeamListPage() {
                         </div>
                     )}
 
-                    <div className="member-list">
+                    <div className="space-y-4">
                         {team.members.map((member, index) => (
                             <div
                                 key={index}
-                                className={`member-card ${team.status} ${team.status === 'pending' && selectedLeader === member.id ? 'selected' : ''}`}
+                                className={`flex items-center justify-between p-3 rounded-md ${
+                                    team.status === 'pending'
+                                        ? selectedLeader === member.id
+                                            ? 'bg-blue-50 border-2 border-blue-200'
+                                            : 'bg-yellow-50 hover:bg-yellow-100 cursor-pointer'
+                                        : team.status === 'approved'
+                                            ? 'bg-green-50'
+                                            : 'bg-red-50'
+                                }`}
                                 onClick={() => team.status === 'pending' && handleSelectLeader(member.id)}
                             >
                                 <div>
-                                    <p className="member-info">
+                                    <p className="font-semibold flex items-center gap-2">
                                         {member.name}
                                         {member.isLeader && (
-                                            <span className="leader-badge">
-                                                <Crown size={14} /> Team Leader
+                                            <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded flex items-center gap-1">
+                                                <Crown size={14} />
+                                                Team Leader
                                             </span>
                                         )}
                                         {team.status === 'pending' && selectedLeader === member.id && (
-                                            <span className="leader-badge">
-                                                <Crown size={14} /> Selected as Leader
+                                            <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded flex items-center gap-1">
+                                                <Crown size={14} />
+                                                Selected as Leader
                                             </span>
                                         )}
                                     </p>
-                                    <div className="member-details-container">
-                                        <div className="member-detail-item">
-                                            <IdCard size={16} />
-                                            <span>Student ID: {member.id}</span>
-                                        </div>
-                                        <div className="member-detail-item">
-                                            <Mail size={16} />
-                                            <span>{member.email}</span>
-                                        </div>
-                                        <div className="member-detail-item">
-                                            <GraduationCap size={16} />
-                                            <span>{member.course}</span>
-                                        </div>
-                                    </div>
+                                    <p className="text-sm text-gray-600 flex items-center gap-2">
+                                        <GraduationCap size={16} />
+                                        ID: {member.id}
+                                    </p>
+                                    <p className="text-sm text-gray-600 flex items-center gap-2">
+                                        <Mail size={16} />
+                                        {member.email}
+                                    </p>
+                                    <p className="text-sm text-gray-500">{member.course}</p>
                                 </div>
-                                <div>
-                                    <span className="tutorial-group">
+                                <div className="text-right">
+                                    <span className="bg-gray-100 px-3 py-1 rounded-full text-gray-700">
                                         {member.tutorialGroup}
                                     </span>
                                 </div>
@@ -251,38 +278,50 @@ export default function TeamListPage() {
     }
 
     return (
-        <div className="team-container">
-            <div className="team-list-container">
-                <h2 className="team-list-title">Registered Teams</h2>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div className="bg-white p-6 rounded-lg shadow-md">
+                <h2 className="text-2xl font-bold mb-6">Registered Teams</h2>
 
                 {teams.length === 0 ? (
-                    <div className="empty-state">
-                        <p className="empty-state-text">No teams registered yet.</p>
+                    <div className="text-center py-12">
+                        <p className="text-gray-500">No teams registered yet.</p>
                     </div>
                 ) : (
-                    <div className="team-list">
+                    <div className="space-y-4">
                         {teams.map((team) => (
-                            <div key={team.id} className="team-list-item">
-                                <div className="team-list-info">
-                                    <Users className="team-icon" />
-                                    <div className="team-list-details">
-                                        <h3>
+                            <div key={team.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100">
+                                <div className="flex items-start gap-4">
+                                    <Users className="w-8 h-8 text-blue-600" />
+                                    <div>
+                                        <h3 className="text-lg font-semibold">
                                             {team.course}-{String(team.groupNo).padStart(2, '0')}
                                         </h3>
-                                        <div className="team-meta">
-                                            <p>{team.members.length} members</p>
-                                            <p>Registered: {team.registrationDate}</p>
+                                        <div className="space-y-1 mt-1">
+                                            <p className="text-gray-600">{team.members.length} members</p>
+                                            <p className="text-gray-600">Registered: {team.registrationDate}</p>
                                         </div>
                                     </div>
                                 </div>
-                                <div className="team-actions">
-                                    <div className={`status-badge ${team.status}`}>
-                                        <div className={`status-indicator-dot ${team.status}`} />
+                                <div className="flex items-center gap-4">
+                                    <div className={`px-3 py-1 rounded-full text-sm flex items-center gap-2 ${
+                                        team.status === 'approved'
+                                            ? 'bg-green-100 text-green-800'
+                                            : team.status === 'rejected'
+                                                ? 'bg-red-100 text-red-800'
+                                                : 'bg-yellow-100 text-yellow-800'
+                                    }`}>
+                                        <div className={`w-2 h-2 rounded-full ${
+                                            team.status === 'approved'
+                                                ? 'bg-green-400'
+                                                : team.status === 'rejected'
+                                                    ? 'bg-red-400'
+                                                    : 'bg-yellow-400 animate-pulse'
+                                        }`} />
                                         {team.status.charAt(0).toUpperCase() + team.status.slice(1)}
                                     </div>
                                     <button
                                         onClick={() => setSelectedTeam(team.id)}
-                                        className="view-details-button"
+                                        className="px-4 py-2 text-blue-600 hover:bg-blue-50 rounded-lg"
                                     >
                                         View Details
                                     </button>

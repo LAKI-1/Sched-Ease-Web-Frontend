@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Mail, Users, ChevronDown, ChevronUp, Award, Code } from 'lucide-react';
+import { Mail, Users, ChevronDown, ChevronUp, Code } from 'lucide-react';
 import '../../css/GroupListPage.css';
 
 interface TeamMember {
@@ -100,8 +100,6 @@ export default function GroupListPage() {
         );
     }
 
-    const leader = group.members.find(member => member.isLeader);
-
     return (
         <div className="group-container">
             <div className="header-container">
@@ -146,101 +144,60 @@ export default function GroupListPage() {
                 </div>
             </div>
 
-            <div className="team-grid">
-                {/* Team Lead Card */}
-                {leader && (
-                    <div className="team-lead-card">
-                        <div className="team-lead-content">
-                            <div className="team-lead-header">
-                                <h4 className="team-lead-title">
-                                    <Award size={20} className="team-lead-icon" />
-                                    Group Leader
-                                </h4>
-                            </div>
-
-                            <div className="team-lead-profile">
-                                <div className="team-lead-avatar">
-                                    {leader.name.split(' ').map(n => n[0]).join('')}
-                                </div>
-                                <p className="team-lead-name">{leader.name}</p>
-                                <p className="team-lead-id">Student ID: {leader.id}</p>
-                            </div>
-
-                            <div className="team-lead-contact">
-                                <div className="contact-item">
-                                    <Mail size={16} className="contact-icon" />
-                                    <span>{leader.email}</span>
-                                </div>
-                                <div className="contact-item">
-                                    <Code size={16} className="contact-icon" />
-                                    <span>{leader.course}</span>
-                                </div>
-                            </div>
-
-                            <div className="mt-4">
-                                <p className="text-sm text-gray-600">Tutorial Group: {leader.tutorialGroup}</p>
-                            </div>
-                        </div>
+            {/* Team Members Section - Now takes full width */}
+            <div className="team-members-card full-width">
+                <div className="team-members-content">
+                    <div className="team-members-header">
+                        <h4 className="team-members-title">
+                            <Users size={20} className="team-members-icon" />
+                            Team Members
+                        </h4>
                     </div>
-                )}
 
-                {/* Team Members Section */}
-                <div className="team-members-card">
-                    <div className="team-members-content">
-                        <div className="team-members-header">
-                            <h4 className="team-members-title">
-                                <Users size={20} className="team-members-icon" />
-                                Team Members
-                            </h4>
-                        </div>
-
-                        <div>
-                            {group.members
-                                .filter(member => !member.isLeader)
-                                .map((member, index) => (
-                                    <div
-                                        key={member.id}
-                                        className="member-card"
-                                    >
-                                        <div
-                                            className="member-header"
-                                            onClick={() => toggleMember(index)}
-                                        >
-                                            <div className="member-info">
-                                                <div className="member-details">
-                                                    <p className="member-name">{member.name}</p>
-                                                    <p className="member-id">Student ID: {member.id}</p>
-                                                </div>
-                                            </div>
-                                            <div className="member-info">
-                                                <span className="member-role">{member.course}</span>
-                                                {expandedMember === index ?
-                                                    <ChevronUp size={18} className="text-gray-500" /> :
-                                                    <ChevronDown size={18} className="text-gray-500" />
-                                                }
-                                            </div>
+                    <div>
+                        {group.members.map((member, index) => (
+                            <div
+                                key={member.id}
+                                className="member-card"
+                            >
+                                <div
+                                    className="member-header"
+                                    onClick={() => toggleMember(index)}
+                                >
+                                    <div className="member-info">
+                                        <div className="member-details">
+                                            <p className="member-name">{member.name}</p>
+                                            <p className="member-id">Student ID: {member.id}</p>
                                         </div>
-
-                                        {expandedMember === index && (
-                                            <div className="member-content">
-                                                <div className="space-y-2">
-                                                    <p className="text-sm text-gray-600">
-                                                        <Mail className="inline-block w-4 h-4 mr-2" />
-                                                        {member.email}
-                                                    </p>
-                                                    <p className="text-sm text-gray-600">
-                                                        <Code className="inline-block w-4 h-4 mr-2" />
-                                                        {member.course}
-                                                    </p>
-                                                    <p className="text-sm text-gray-600">
-                                                        Tutorial Group: {member.tutorialGroup}
-                                                    </p>
-                                                </div>
-                                            </div>
-                                        )}
                                     </div>
-                                ))}
-                        </div>
+                                    <div className="member-info">
+                                        <span className="member-role">{member.course}</span>
+                                        {expandedMember === index ?
+                                            <ChevronUp size={18} className="text-gray-500" /> :
+                                            <ChevronDown size={18} className="text-gray-500" />
+                                        }
+                                    </div>
+                                </div>
+
+                                {expandedMember === index && (
+                                    <div className="member-content">
+                                        <div className="space-y-2">
+                                            <p className="text-sm text-gray-600">
+                                                <Mail className="inline-block w-4 h-4 mr-2" />
+                                                {member.email}
+                                            </p>
+                                            <p className="text-sm text-gray-600">
+                                                <Code className="inline-block w-4 h-4 mr-2" />
+                                                {member.course}
+                                            </p>
+                                            <p className="text-sm text-gray-600">
+                                                Tutorial Group: {member.tutorialGroup}
+                                            </p>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        ))}
                     </div>
                 </div>
             </div>
