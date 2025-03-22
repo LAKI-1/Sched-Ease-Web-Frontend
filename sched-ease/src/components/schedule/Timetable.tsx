@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Users, MessageSquare, MapPin, PlusCircle, Trash2, Save, Loader } from 'lucide-react';
+import React, { useState, useEffect, ChangeEvent } from 'react';
+import { Users, MessageSquare, MapPin, Trash2, Save, Upload } from 'lucide-react';
 import axios from 'axios';
 import '../../css/Timetable.css';
 
@@ -155,48 +155,54 @@ export function Timetable() {
 
     const filteredSessions = sessions.filter(session => session.group === selectedGroup);
 
-    const handleAddSession = () => {
-        if (newSession.lecturer && newSession.building && newSession.classroom) {
-            // Validate that end time is after start time
-            if (newSession.endTime <= newSession.startTime) {
-                alert('End time must be after start time');
-                return;
-            }
+    const handleCSVUpload = async (event: ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        if (!file) return;
 
-            // Find the corresponding hall and lecturer IDs
-            const hall = halls.find(h => h.name === newSession.building);
-            const lecturer = lecturers.find(l => l.name === newSession.lecturer);
+        try {
+            const text = await file.text();
+            const rows = text.split('\n').map(row => row.trim());
+            
+            // Skip header row and empty rows
+            const validRows = rows.slice(1).filter(row => row.length > 0);
+            
+            const newSessions: GroupSession[] = validRows.map((row, index) => {
+                const [lecturer, module, date, startTime, endTime, type, building, classroom] = row.split(',').map(cell => cell.trim());
+                
+                // Find the corresponding hall and lecturer IDs
+                const hall = halls.find(h => h.name === classroom && h.building === building);
+                const lecturerObj = lecturers.find(l => l.name === lecturer);
 
-            if (!hall || !lecturer) {
-                alert('Invalid hall or lecturer selected');
-                return;
-            }
+                if (!hall || !lecturerObj) {
+                    throw new Error(`Invalid hall or lecturer in row ${index + 2}`);
+                }
 
-            setSessions([...sessions, {
-                ...newSession,
-                id: (sessions.length + 1).toString(),
-                group: selectedGroup,
-                hallId: hall.id,
-                lecturerId: lecturer.id
-            }]);
-
-            setNewSession({
-                id: '',
-                group: selectedGroup,
-                lecturer: '',
-                module: '',
-                date: 'Monday',
-                startTime: '09:00',
-                endTime: '10:30',
-                type: 'Lecture',
-                building: '',
-                classroom: '',
-                lecturerId: undefined,
-                hallId: undefined,
-                timeTableId: 1
+                return {
+                    id: `${Date.now()}-${index}`, // More unique ID generation
+                    group: selectedGroup, // Always use the selected group
+                    lecturer,
+                    module,
+                    date,
+                    startTime,
+                    endTime,
+                    type: type as 'Lecture' | 'Tutorial',
+                    building,
+                    classroom,
+                    lecturerId: lecturerObj.id,
+                    hallId: hall.id,
+                    timeTableId: 1
+                };
             });
-        } else {
-            alert('Please fill out all fields to add a session.');
+
+            // Add new sessions while preserving existing ones for other groups
+            const otherGroupSessions = sessions.filter(session => session.group !== selectedGroup);
+            setSessions([...otherGroupSessions, ...newSessions]);
+            
+            event.target.value = ''; // Reset file input
+            alert(`Successfully imported ${newSessions.length} sessions for group ${selectedGroup}!`);
+        } catch (error) {
+            alert(`Error importing sessions for group ${selectedGroup}. Please ensure the file format is correct:\nLecturer,Module,Day,StartTime,EndTime,Type,Building,Classroom`);
+            console.error('CSV parsing error:', error);
         }
     };
 
@@ -272,152 +278,24 @@ export function Timetable() {
                 </select>
             </div>
 
-            {/* Add Session Form */}
-            <div className="add-session-form">
-                <h3 className="form-title">Add New Session</h3>
-                <div className="form-grid">
-                    <div className="form-group">
-                        <label className="form-label">Lecturer</label>
-                        <div className="select-wrapper">
-                            <select
-                                value={newSession.lecturer}
-                                onChange={(e) => {
-                                    const lecturer = lecturers.find(l => l.name === e.target.value);
-                                    setNewSession({
-                                        ...newSession,
-                                        lecturer: e.target.value,
-                                        lecturerId: lecturer?.id
-                                    });
-                                }}
-                                className="form-select"
-                                disabled={isLoading.lecturers}
-                            >
-                                <option value="">Select Lecturer</option>
-                                {lecturers.map(lecturer => (
-                                    <option key={lecturer.id} value={lecturer.name}>
-                                        {lecturer.name}
-                                    </option>
-                                ))}
-                            </select>
-                            {isLoading.lecturers && (
-                                <div className="select-loading">
-                                    <Loader size={16} className="loading-spinner" />
-                                </div>
-                            )}
-                        </div>
-                        {loadError.lecturers && (
-                            <div className="error-message">{loadError.lecturers}</div>
-                        )}
-                    </div>
-                    <div className="form-group">
-                        <label className="form-label">Module</label>
-                        <input
-                            type="text"
-                            value={newSession.module}
-                            onChange={(e) => setNewSession({ ...newSession, module: e.target.value })}
-                            className="form-input"
-                            placeholder="e.g., CS101"
-                        />
-                    </div>
-                    <div className="form-group">
-                        <label className="form-label">Date</label>
-                        <select
-                            value={newSession.date}
-                            onChange={(e) => setNewSession({ ...newSession, date: e.target.value })}
-                            className="form-select"
-                        >
-                            {days.map(day => (
-                                <option key={day} value={day}>{day}</option>
-                            ))}
-                        </select>
-                    </div>
-                    <div className="form-group">
-                        <label className="form-label">Start Time</label>
-                        <select
-                            value={newSession.startTime}
-                            onChange={(e) => setNewSession({ ...newSession, startTime: e.target.value })}
-                            className="form-select"
-                        >
-                            {endTimes.slice(0, -1).map(time => (
-                                <option key={time} value={time}>{time}</option>
-                            ))}
-                        </select>
-                    </div>
-                    <div className="form-group">
-                        <label className="form-label">End Time</label>
-                        <select
-                            value={newSession.endTime}
-                            onChange={(e) => setNewSession({ ...newSession, endTime: e.target.value })}
-                            className="form-select"
-                        >
-                            {endTimes.slice(1).map(time => (
-                                <option key={time} value={time}>{time}</option>
-                            ))}
-                        </select>
-                    </div>
-                    <div className="form-group">
-                        <label className="form-label">Type</label>
-                        <select
-                            value={newSession.type}
-                            onChange={(e) => setNewSession({ ...newSession, type: e.target.value as 'Lecture' | 'Tutorial' })}
-                            className="form-select"
-                        >
-                            <option value="Lecture">Lecture</option>
-                            <option value="Tutorial">Tutorial</option>
-                        </select>
-                    </div>
-                    <div className="form-group">
-                        <label className="form-label">Building</label>
-                        <div className="select-wrapper">
-                            <select
-                                value={newSession.building}
-                                onChange={(e) => {
-                                    const hall = halls.find(h => h.name === e.target.value);
-                                    setNewSession({
-                                        ...newSession,
-                                        building: hall?.building || '',
-                                        classroom: hall?.name || '',
-                                        hallId: hall?.id
-                                    });
-                                }}
-                                className="form-select"
-                                disabled={isLoading.halls}
-                            >
-                                <option value="">Select Building</option>
-                                {halls.map(hall => (
-                                    <option key={hall.id} value={hall.name}>
-                                        {hall.building} - {hall.name}
-                                    </option>
-                                ))}
-                            </select>
-                            {isLoading.halls && (
-                                <div className="select-loading">
-                                    <Loader size={16} className="loading-spinner" />
-                                </div>
-                            )}
-                        </div>
-                        {loadError.halls && (
-                            <div className="error-message">{loadError.halls}</div>
-                        )}
-                    </div>
-                    <div className="form-group">
-                        <label className="form-label">Classroom</label>
-                        <input
-                            type="text"
-                            value={newSession.classroom}
-                            className="form-input"
-                            disabled
-                            placeholder="Automatically set from building selection"
-                        />
-                    </div>
+            {/* CSV Upload Section */}
+            <div className="csv-upload-section">
+                <h3 className="section-title">Import Timetable for {selectedGroup}</h3>
+                <div className="csv-upload-container">
+                    <label htmlFor="csv-upload" className="csv-upload-label">
+                        <Upload size={20} />
+                        <span>Choose CSV file or drag & drop to add sessions for {selectedGroup}</span>
+                        <small>CSV Format: Lecturer,Module,Day,StartTime,EndTime,Type,Building,Classroom</small>
+                        <small>Note: This will add new sessions while preserving existing ones</small>
+                    </label>
+                    <input
+                        id="csv-upload"
+                        type="file"
+                        accept=".csv"
+                        onChange={handleCSVUpload}
+                        className="csv-upload-input"
+                    />
                 </div>
-                <button
-                    onClick={handleAddSession}
-                    className="add-button"
-                    disabled={isLoading.halls || isLoading.lecturers}
-                >
-                    <PlusCircle size={16} className="add-button-icon" /> Add Session
-                </button>
             </div>
 
             {/* Timetable */}
