@@ -1,7 +1,8 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { useAuthStore } from './lib/store/authStore';
 import LoginForm from './components/auth/LoginForm';
+import OAuthRedirectHandler from './components/auth/OAuthRedirectHandler';
 import Header from './components/layout/Header';
 import AdminDashboard from './components/dashboard/AdminDashboard';
 import SDGPAdminDashboard from './components/dashboard/SDGPAdminDashboard';
@@ -18,6 +19,7 @@ import FeedbackSession from './components/schedule/FeedbackSession';
 import SchedulePage from './components/schedule/SchedulePage';
 import SettingsPage from './components/settings/SettingsPage';
 import SplashScreen from './components/Splash Screen/splashscreen';
+// import GoogleLogin from './components/google/googleLogin.tsx';
 
 const App: React.FC = () => {
     const [loading, setLoading] = useState(true);
@@ -43,8 +45,14 @@ const App: React.FC = () => {
                 <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
                     <Routes>
                         <Route path="/login" element={isAuthenticated ? <Navigate to="/dashboard" /> : <LoginForm />} />
+                        <Route path="/loginform" element={<LoginForm />} />
+                        <Route path="/oauth-redirect" element={<OAuthRedirectHandler />} />
 
-                        {/* Protected Route for Dashboards */}
+                        <Route path="/admindashboard" element={<AdminDashboard />} />
+                        <Route path="/sdgpadmindashboard" element={<SDGPAdminDashboard />} />
+                        <Route path="/studentdashboard" element={<StudentDashboard />} />
+                        <Route path="/lecturerdashboard" element={<LecturerDashboard />} />
+
                         <Route path="/dashboard" element={
                             <ProtectedRoute>
                                 {user?.role === 'admin' ? (
@@ -97,14 +105,14 @@ const App: React.FC = () => {
                         }
                         />
 
-                        <Route  path="/timetable" element={
+                        <Route path="/timetable" element={
                             <ProtectedRoute>
                                 <Timetable />
                             </ProtectedRoute>
                         }
                         />
 
-                        <Route  path="/schedule-page" element={
+                        <Route path="/schedule-page" element={
                             <ProtectedRoute>
                                 <SchedulePage />
                             </ProtectedRoute>
