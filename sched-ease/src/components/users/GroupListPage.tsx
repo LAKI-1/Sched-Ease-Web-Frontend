@@ -1,112 +1,112 @@
-import { useState } from 'react';
-import { Mail, Phone, Users, ChevronDown, ChevronUp, Award, Code, Palette, Database, FileText } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Mail, Users, ChevronDown, ChevronUp, Award, Code } from 'lucide-react';
 import '../../css/GroupListPage.css';
 
-type Skill = string;
-
 interface TeamMember {
+    id: number;
     name: string;
-    studentId: string;
-    role: string;
-    bio: string;
-    skills: Skill[];
-    icon?: React.ReactNode;
-}
-
-interface TeamLeader extends TeamMember {
     email: string;
-    mobile: string;
+    course: string;
+    tutorialGroup: string;
+    isLeader: boolean;
 }
 
-interface GroupInfo {
-    name: string;
-    leader: TeamLeader;
+interface Group {
+    id: string;
+    teamId: string;
+    course: string;
+    groupNo: number;
+    status: 'pending' | 'approved' | 'rejected';
+    registrationDate: string;
     members: TeamMember[];
-    supervisor: string;
-    projectDescription: string;
-    deadline: string;
+}
+
+interface ApiError {
+    message: string;
 }
 
 export default function GroupListPage() {
     const [expandedMember, setExpandedMember] = useState<number | null>(null);
+    const [group, setGroup] = useState<Group | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
 
-    const groupInfo: GroupInfo = {
-        name: 'Team Alpha',
-        leader: {
-            name: 'John Smith',
-            email: 'john.smith@example.com',
-            mobile: '+1234567890',
-            studentId: 'ST12345',
-            bio: 'Full-stack developer with 3 years of experience in React and Node.js.',
-            skills: ['Project Management', 'React', 'Node.js', 'MongoDB'],
-            role: 'Team Leader'
-        },
-        members: [
-            {
-                name: 'Sarah Johnson',
-                studentId: 'ST12346',
-                role: 'Frontend Developer',
-                bio: 'Passionate about creating intuitive user interfaces with modern JavaScript frameworks.',
-                skills: ['React', 'Vue.js', 'CSS/SASS', 'JavaScript'],
-                icon: <Code className="text-blue-500" />
-            },
-            {
-                name: 'Michael Lee',
-                studentId: 'ST12347',
-                role: 'Backend Developer',
-                bio: 'Database expert specializing in API design and performance optimization.',
-                skills: ['Python', 'Django', 'SQL', 'Docker'],
-                icon: <Code className="text-green-500" />
-            },
-            {
-                name: 'Emily Brown',
-                studentId: 'ST12348',
-                role: 'UI/UX Designer',
-                bio: 'Creative designer with a focus on user-centered design principles.',
-                skills: ['Figma', 'Adobe XD', 'Prototyping', 'User Research'],
-                icon: <Palette className="text-purple-500" />
-            },
-            {
-                name: 'David Wilson',
-                studentId: 'ST12349',
-                role: 'Database Administrator',
-                bio: 'Experienced in designing and optimizing database structures for high-performance applications.',
-                skills: ['MongoDB', 'PostgreSQL', 'Database Optimization', 'Data Modeling'],
-                icon: <Database className="text-red-500" />
-            },
-            {
-                name: 'Jennifer Garcia',
-                studentId: 'ST12350',
-                role: 'Technical Writer',
-                bio: 'Specializes in creating clear, concise documentation for complex technical systems.',
-                skills: ['Documentation', 'Technical Writing', 'Markdown', 'UX Copy'],
-                icon: <FileText className="text-amber-500" />
+    useEffect(() => {
+        fetchGroup();
+    }, []);
+
+    const fetchGroup = async () => {
+        setIsLoading(true);
+        setError(null);
+        try {
+            const response = await fetch('http://localhost:8080/api/teams');
+            if (!response.ok) {
+                const errorData: ApiError = await response.json();
+                throw new Error(errorData.message || 'Failed to fetch group');
             }
-        ],
-        supervisor: 'Dr. Sarah Wilson',
-        projectDescription: 'Developing an innovative campus navigation system with AR features to help new students find their way around campus facilities.',
-        deadline: 'May 15, 2025'
-    };
-
-    const toggleMember = (index: number) => {
-        if (expandedMember === index) {
-            setExpandedMember(null);
-        } else {
-            setExpandedMember(index);
+            const data = await response.json();
+            // Get the first approved group for now
+            // You might want to modify this to get a specific group based on some criteria
+            const approvedGroup = data.find((g: Group) => g.status === 'approved');
+            if (!approvedGroup) {
+                throw new Error('No approved group found');
+            }
+            setGroup(approvedGroup);
+        } catch (error) {
+            setError('Failed to load group: ' + (error as Error).message);
+        } finally {
+            setIsLoading(false);
         }
     };
 
-    const SkillBadge = ({ skill }: { skill: Skill }) => (
-        <span className="skill-badge">
-            {skill}
-        </span>
-    );
+    const toggleMember = (index: number) => {
+        setExpandedMember(expandedMember === index ? null : index);
+    };
+
+    if (isLoading) {
+        return (
+            <div className="group-container">
+                <div className="text-center py-4">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+                    <p className="mt-2 text-gray-600">Loading group details...</p>
+                </div>
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div className="group-container">
+                <div className="text-center py-4">
+                    <p className="text-red-500">{error}</p>
+                    <button
+                        onClick={fetchGroup}
+                        className="mt-2 text-blue-600 hover:text-blue-800"
+                    >
+                        Try Again
+                    </button>
+                </div>
+            </div>
+        );
+    }
+
+    if (!group) {
+        return (
+            <div className="group-container">
+                <div className="text-center py-4">
+                    <p className="text-gray-500">No approved group found.</p>
+                </div>
+            </div>
+        );
+    }
+
+    const leader = group.members.find(member => member.isLeader);
 
     return (
         <div className="group-container">
             <div className="header-container">
                 <h2 className="header-title">
-                    <span>{groupInfo.name}</span> Dashboard
+                    <span>Team {group.teamId}</span> Dashboard
                 </h2>
             </div>
 
@@ -114,10 +114,30 @@ export default function GroupListPage() {
             <div className="project-card">
                 <div className="project-header">
                     <div>
-                        <h3 className="project-title">Project Overview</h3>
-                        <p className="project-description">{groupInfo.projectDescription}</p>
-                        <div className="project-deadline">
-                            <span>Deadline:</span> {groupInfo.deadline}
+                        <h3 className="project-title">Group Overview</h3>
+                        <p className="project-description">
+                            Course: {group.course}
+                            <br />
+                            Group Number: {group.groupNo}
+                        </p>
+                        <div className="flex items-center mt-2">
+                            <span className="mr-2">Status:</span>
+                            <div className={`px-3 py-1 rounded-full text-sm inline-flex items-center gap-2 ${
+                                group.status === 'approved'
+                                    ? 'bg-green-100 text-green-800'
+                                    : group.status === 'rejected'
+                                        ? 'bg-red-100 text-red-800'
+                                        : 'bg-yellow-100 text-yellow-800'
+                            }`}>
+                                <div className={`w-2 h-2 rounded-full ${
+                                    group.status === 'approved'
+                                        ? 'bg-green-400'
+                                        : group.status === 'rejected'
+                                            ? 'bg-red-400'
+                                            : 'bg-yellow-400'
+                                }`} />
+                                {group.status.charAt(0).toUpperCase() + group.status.slice(1)}
+                            </div>
                         </div>
                     </div>
                     <div className="project-icon-container">
@@ -128,44 +148,41 @@ export default function GroupListPage() {
 
             <div className="team-grid">
                 {/* Team Lead Card */}
-                <div className="team-lead-card">
-                    <div className="team-lead-content">
-                        <div className="team-lead-header">
-                            <h4 className="team-lead-title">
-                                <Award size={20} className="team-lead-icon" />
-                                Group Leader
-                            </h4>
-                        </div>
-
-                        <div className="team-lead-profile">
-                            <div className="team-lead-avatar">
-                                {groupInfo.leader.name.split(' ').map(n => n[0]).join('')}
+                {leader && (
+                    <div className="team-lead-card">
+                        <div className="team-lead-content">
+                            <div className="team-lead-header">
+                                <h4 className="team-lead-title">
+                                    <Award size={20} className="team-lead-icon" />
+                                    Group Leader
+                                </h4>
                             </div>
-                            <p className="team-lead-name">{groupInfo.leader.name}</p>
-                            <p className="team-lead-id">Student ID: {groupInfo.leader.studentId}</p>
-                        </div>
 
-                        <div className="team-lead-contact">
-                            <div className="contact-item">
-                                <Mail size={16} className="contact-icon" />
-                                <span>{groupInfo.leader.email}</span>
+                            <div className="team-lead-profile">
+                                <div className="team-lead-avatar">
+                                    {leader.name.split(' ').map(n => n[0]).join('')}
+                                </div>
+                                <p className="team-lead-name">{leader.name}</p>
+                                <p className="team-lead-id">Student ID: {leader.id}</p>
                             </div>
-                            <div className="contact-item">
-                                <Phone size={16} className="contact-icon" />
-                                <span>{groupInfo.leader.mobile}</span>
-                            </div>
-                        </div>
 
-                        <div>
-                            <p className="team-lead-bio">{groupInfo.leader.bio}</p>
-                            <div>
-                                {groupInfo.leader.skills.map((skill, i) => (
-                                    <SkillBadge key={i} skill={skill} />
-                                ))}
+                            <div className="team-lead-contact">
+                                <div className="contact-item">
+                                    <Mail size={16} className="contact-icon" />
+                                    <span>{leader.email}</span>
+                                </div>
+                                <div className="contact-item">
+                                    <Code size={16} className="contact-icon" />
+                                    <span>{leader.course}</span>
+                                </div>
+                            </div>
+
+                            <div className="mt-4">
+                                <p className="text-sm text-gray-600">Tutorial Group: {leader.tutorialGroup}</p>
                             </div>
                         </div>
                     </div>
-                </div>
+                )}
 
                 {/* Team Members Section */}
                 <div className="team-members-card">
@@ -175,52 +192,54 @@ export default function GroupListPage() {
                                 <Users size={20} className="team-members-icon" />
                                 Team Members
                             </h4>
-                            <div className="supervisor-text">
-                                Supervised by: {groupInfo.supervisor}
-                            </div>
                         </div>
 
                         <div>
-                            {groupInfo.members.map((member, index) => (
-                                <div
-                                    key={index}
-                                    className="member-card"
-                                >
+                            {group.members
+                                .filter(member => !member.isLeader)
+                                .map((member, index) => (
                                     <div
-                                        className="member-header"
-                                        onClick={() => toggleMember(index)}
+                                        key={member.id}
+                                        className="member-card"
                                     >
-                                        <div className="member-info">
-                                            <div className="member-icon-container">
-                                                {member.icon}
+                                        <div
+                                            className="member-header"
+                                            onClick={() => toggleMember(index)}
+                                        >
+                                            <div className="member-info">
+                                                <div className="member-details">
+                                                    <p className="member-name">{member.name}</p>
+                                                    <p className="member-id">Student ID: {member.id}</p>
+                                                </div>
                                             </div>
-                                            <div className="member-details">
-                                                <p className="member-name">{member.name}</p>
-                                                <p className="member-id">Student ID: {member.studentId}</p>
+                                            <div className="member-info">
+                                                <span className="member-role">{member.course}</span>
+                                                {expandedMember === index ?
+                                                    <ChevronUp size={18} className="text-gray-500" /> :
+                                                    <ChevronDown size={18} className="text-gray-500" />
+                                                }
                                             </div>
                                         </div>
-                                        <div className="member-info">
-                                            <span className="member-role">{member.role}</span>
-                                            {expandedMember === index ?
-                                                <ChevronUp size={18} className="text-gray-500" /> :
-                                                <ChevronDown size={18} className="text-gray-500" />
-                                            }
-                                        </div>
-                                    </div>
 
-                                    {expandedMember === index && (
-                                        <div className="member-content">
-                                            <p className="member-bio">{member.bio}</p>
-                                            <div>
-                                                <p className="skills-label">Skills:</p>
-                                                {member.skills.map((skill, i) => (
-                                                    <SkillBadge key={i} skill={skill} />
-                                                ))}
+                                        {expandedMember === index && (
+                                            <div className="member-content">
+                                                <div className="space-y-2">
+                                                    <p className="text-sm text-gray-600">
+                                                        <Mail className="inline-block w-4 h-4 mr-2" />
+                                                        {member.email}
+                                                    </p>
+                                                    <p className="text-sm text-gray-600">
+                                                        <Code className="inline-block w-4 h-4 mr-2" />
+                                                        {member.course}
+                                                    </p>
+                                                    <p className="text-sm text-gray-600">
+                                                        Tutorial Group: {member.tutorialGroup}
+                                                    </p>
+                                                </div>
                                             </div>
-                                        </div>
-                                    )}
-                                </div>
-                            ))}
+                                        )}
+                                    </div>
+                                ))}
                         </div>
                     </div>
                 </div>
