@@ -162,7 +162,7 @@ export default function TeamListPage() {
                             <div className={`status-dot ${team.status}`} />
                             <span className={`status-text ${team.status}`}>
                                 {team.status === 'pending' ? 'Pending Approval' :
-                                 team.status === 'approved' ? 'Approved' : 'Rejected'}
+                                    team.status === 'approved' ? 'Approved' : 'Rejected'}
                             </span>
                         </div>
                     </div>
