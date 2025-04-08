@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { LogIn } from 'lucide-react';
 import { useAuthStore } from '../../lib/store/authStore';
-import { loginUser, loginGoogleUser } from '../../lib/api/auth';
+// import { loginUser, loginGoogleUser } from '../../lib/api/auth';
+import { loginUser } from '../../lib/api/auth';
 import { UserRole } from '../../types/auth';
 import Button from '../ui/Button';
 import Input from '../ui/Input';
@@ -89,7 +90,7 @@ export default function LoginForm() {
 
         // }
         try {
-            const { data, error } = await supabase.auth.signInWithOAuth({
+            const { error } = await supabase.auth.signInWithOAuth({
                 provider: 'google',
                 options: {
                     queryParams: {

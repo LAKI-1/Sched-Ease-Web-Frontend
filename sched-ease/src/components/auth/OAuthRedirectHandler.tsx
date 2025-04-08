@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useAuthStore } from '../../lib/store/authStore';
 import { loginGoogleUser } from '../../lib/api/auth';
 import { useNavigate } from 'react-router-dom';
@@ -14,6 +14,10 @@ export default function OAuthRedirectHandler() {
     useEffect(() => {
         const handleOAuthLogin = async () => {
             try {
+
+                if (isLoading) {
+                    console.log('Loading...');
+                }
                 const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
                 if (sessionError) throw sessionError;
 
